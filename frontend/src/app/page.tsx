@@ -4,7 +4,7 @@ import SideBar from "./components/sideBar";
 import Light from "./components/light";
 
 export default function Page() {
-    const [selectedOption, setSelectedOption] = useState("Home"); // Default option
+    const [selectedOption, setSelectedOption] = useState("Light");
     const options = ["Light", "Thermostat"];
 
     // Update the selected option
@@ -13,7 +13,7 @@ export default function Page() {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex">
           <div className="">
             <SideBar options={options} onSelect={handleOptionSelect} />
           </div>
