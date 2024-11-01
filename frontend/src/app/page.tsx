@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import SideBar from "./components/sideBar";
+import Light from "./components/light";
 
 export default function Page() {
     const [selectedOption, setSelectedOption] = useState("Home"); // Default option
@@ -16,11 +17,8 @@ export default function Page() {
           <div className="">
             <SideBar options={options} onSelect={handleOptionSelect} />
           </div>
-            <main className="p-8">
-                {selectedOption === "Home" && <div>Welcome to the Home Page</div>}
-                {selectedOption === "Profile" && <div>Here is your Profile</div>}
-                {selectedOption === "Settings" && <div>Adjust your Settings here</div>}
-                {selectedOption === "About" && <div>About this Application</div>}
+            <main className="p-8 bg-white w-full">
+                {selectedOption === "Light" && <Light />}
             </main>
         </div>
     );
