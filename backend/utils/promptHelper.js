@@ -9,9 +9,9 @@ const org_ID = process.env.OPENAI_ORG_ID;
 const project_ID = process.env.OPENAI_PROJECT_ID;
 
 const openai = new OpenAI({
-    organization: org_ID,
-    project: project_ID,
-    apiKey: apiKey,
+    apiKey,
+    orgId: org_ID,
+    projectId: project_ID,
 });
 
 const generatePrompt = async (prompt) => {

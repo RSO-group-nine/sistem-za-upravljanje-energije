@@ -33,8 +33,8 @@ module.exports = {
 		 *
 		 * @param {String} prompt - User name
 		 */
-		welcome: {
-			rest: "/prompt",
+		prompt: {
+			rest: "POST /prompt",
 			params: {
 				prompt: "string"
 			},
