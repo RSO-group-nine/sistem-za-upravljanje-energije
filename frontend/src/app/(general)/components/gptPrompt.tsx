@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { NextResponse, NextRequest } from "next/server";
 
 
 export default function GptPrompt() {
@@ -16,7 +17,25 @@ export default function GptPrompt() {
             return;
         }
         setError('');
-        console.log('Prompting with:', { prompt });
+        const bod = JSON.stringify({ prompt });
+        console.log('Body:', bod);
+        const res = await fetch('http://localhost:5000/api/v1/gpt/prompt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+        });
+        if (!res.ok) {
+            const message = `An error has occured: ${res.status}`;
+            console.error(message);
+            setError(message);
+            return;
+        }else{
+            const data = await res.json();
+            console.log("data:", data);
+            setResponse(data);
+        }
     };
     
     return (
@@ -43,8 +62,7 @@ export default function GptPrompt() {
                 <div>
                     <label className="block mb-2 text-sm font-medium text-gray-600">Response</label>
                     <textarea
-                    value={response}
-                    onChange={(e) => setResponse(e.target.value)}
+                    value={response} 
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Response"
                     readOnly

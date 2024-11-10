@@ -17,7 +17,7 @@ module.exports = {
 	/** @type {ApiSettingsSchema} More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html */
 	settings: {
 		// Exposed port
-		port: process.env.PORT || 3000,
+		port: process.env.PORT || 5000,
 
 		// Exposed IP
 		ip: "0.0.0.0",
@@ -27,11 +27,19 @@ module.exports = {
 
 		routes: [
 			{
-				path: "/api",
+				path: `/api/${process.env.API_VERSION || 'v1'}`,
 
 				whitelist: [
 					"**"
 				],
+				cors: {
+					origin: ["*"], // Allow only specific origin
+					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
+					exposedHeaders: [],
+					credentials: true,
+					maxAge: 3600
+				  },
 
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
