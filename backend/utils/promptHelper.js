@@ -8,8 +8,6 @@ const apiKey = process.env.OPENAI_API_KEY;
 const org_ID = process.env.OPENAI_ORG_ID;
 const project_ID = process.env.OPENAI_PROJECT_ID;
 
-console.log(org_ID, project_ID, apiKey);
-
 const openai = new OpenAI({
     organization: org_ID,
     project: project_ID,

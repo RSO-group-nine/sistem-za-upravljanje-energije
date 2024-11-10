@@ -29,6 +29,7 @@
     "moleculer": "^0.14.26",
     "moleculer-db": "^0.8.20",
     "moleculer-db-adapter-mongo": "^0.4.15",
+    "moleculer-db-adapter-sequelize": "^0.2.18",
     "moleculer-web": "^0.10.4",
     "nats": "^2.7.1",
     "openai": "^4.71.1"
