@@ -16,7 +16,7 @@ export default function GptPrompt() {
         setError('');
         const bod = JSON.stringify({ prompt });
         console.log('Body:', bod);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}gpt/prompt`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/gpt/prompt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

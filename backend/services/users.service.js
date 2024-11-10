@@ -2,7 +2,7 @@
 
 const DbService = require("moleculer-db");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, where } = require("sequelize");
 
 /**
  * @typedef {import('moleculer').Context} Context
@@ -21,7 +21,6 @@ module.exports = {
 		name: "user",
 		define: {
 			id: { type: DataTypes.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
-			name: { type: DataTypes.STRING, allowNull: false },
 			email: { type: DataTypes.STRING, allowNull: false, unique: true },
 			password: { type: DataTypes.STRING, allowNull: false }
 		},
@@ -34,7 +33,6 @@ module.exports = {
 	settings: {
 		// Validation rules for actions
 		entityValidator: {
-			name: { type: "string", min: 3 },
 			email: { type: "email" },
 			password: { type: "string", min: 6 }
 		}
@@ -44,7 +42,6 @@ module.exports = {
 		// Create a new user
 		create: {
 			params: {
-				name: "string",
 				email: "email",
 				password: "string|min:6"
 			},
@@ -55,12 +52,20 @@ module.exports = {
 		},
 
 		// Retrieve a user by ID
-		get: {
+		verifyUser: {
+            rest: "POST /verify",
 			params: {
-				id: "string"
+				email: "email",
+                password: "string"
 			},
 			async handler(ctx) {
-				return await this.adapter.findById(ctx.params.id);
+                this.logger.info('Verify user:', ctx.params);
+				const user = await this.adapter.findOne({where: ctx.params});
+
+                if (!user) {
+                    return { error: "User not found", status: 404 };
+                }
+                return { user: user, status: 200 };
 			}
 		},
 
@@ -68,7 +73,6 @@ module.exports = {
 		update: {
 			params: {
 				id: "string",
-				name: { type: "string", optional: true },
 				email: { type: "email", optional: true },
 				password: { type: "string", optional: true, min: 6 }
 			},
@@ -95,8 +99,8 @@ module.exports = {
 		 */
 		async seedDB() {
 			await this.adapter.insertMany([
-				{ name: "John Doe", email: "john@example.com", password: "password123" },
-				{ name: "Jane Smith", email: "jane@example.com", password: "password456" }
+				{ email: "john@example.com", password: "password123" },
+				{ email: "jane@example.com", password: "password456" }
 			]);
 		}
 	},

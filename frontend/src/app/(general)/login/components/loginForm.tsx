@@ -4,11 +4,36 @@ import { useState } from "react";
 export default function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        // Handle login logic here
-        console.log('Logging in with:', { email, password });
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/verify`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+            if (!response.ok) {
+                setError("An error has occured");
+                return;
+            }else {
+                const r = await response.json();
+                if (r.status != 200) {
+                    window.alert(r.error);
+                    
+                }else {
+                    window.alert("Login successful");
+                    console.log(r);
+                }
+            }
+        } catch (error) {
+            console.error("An error has occured:", error);
+            setError("An error has occured");
+        }          
     };
     return (
         <main>
