@@ -30,7 +30,8 @@
     "moleculer-db": "^0.8.20",
     "moleculer-db-adapter-mongo": "^0.4.15",
     "moleculer-web": "^0.10.4",
-    "nats": "^2.7.1"
+    "nats": "^2.7.1",
+    "openai": "^4.71.1"
   },
   "engines": {
     "node": ">= 16.x.x"

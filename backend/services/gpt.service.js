@@ -1,9 +1,11 @@
 "use strict";
 
+const helpers = require("../utils/promptHelper.js");
+
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
  * @typedef {import('moleculer').Context} Context Moleculer's Context
- */
+*/
 
 /** @type {ServiceSchema} */
 module.exports = {
@@ -19,7 +21,8 @@ module.exports = {
 	/**
 	 * Dependencies
 	 */
-	dependencies: [],
+	dependencies: [
+	],
 
 	/**
 	 * Actions
@@ -38,7 +41,15 @@ module.exports = {
 			/** @param {Context} ctx  */
 			async handler(ctx) {
                 console.log('Prompt:', ctx.params.prompt);
-				return `Your prompt was, ${ctx.params.prompt}`;
+				try {
+					const promptResponse = await helpers.generatePrompt(ctx.params.prompt);
+
+					this.broker.logger.info(`The response to your question is, ${promptResponse}`);
+					return `The response to your question is, ${promptResponse}`;
+				} catch (error) {
+					this.broker.logger.error("Failed to get response from OpenAI.");
+					return "Failed to get response from OpenAI.";
+				}
 			}
 		}
 	},
