@@ -1,13 +1,10 @@
 "use client";
 import { useState } from "react";
-import { NextResponse, NextRequest } from "next/server";
-
 
 export default function GptPrompt() {
     const [prompt, setPrompt] = useState('');
     const [response, setResponse] = useState('');
     const [error, setError] = useState('');
-
     const handlePrompt = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (prompt === '') {
@@ -19,7 +16,7 @@ export default function GptPrompt() {
         setError('');
         const bod = JSON.stringify({ prompt });
         console.log('Body:', bod);
-        const res = await fetch('http://localhost:5000/api/v1/gpt/prompt', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}gpt/prompt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
