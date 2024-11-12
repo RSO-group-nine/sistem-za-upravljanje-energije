@@ -1,23 +1,40 @@
 'use client'
 import { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import verifyUser from '@/app/utils/jwtHandler';
+import { useEffect } from 'react';
 
 export default function LoginForm() {
     const router = useRouter();
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const token = localStorage.getItem('token')
+            if (token == null) {
+                return
+            }
+            const userId = await verifyUser(token as string)
+            console.log("User ID:", userId)
+            if (userId != null) {
+                console.log("User is already logged in")
+                router.push('/dashboard')
+            }
+        }
+        checkUser();
+    }, [])
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget)
         const email = formData.get('email')
         const password = formData.get('password')
-
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
             });
             if (!response.ok) {
                 console.log(response);
@@ -26,9 +43,11 @@ export default function LoginForm() {
             }else {
                 //get response metadata
                 const data = await response.json();
-                const token = data.user.token;
+                const data_token = data.user.token;
 
-                console.log("token:", token);
+                //save token to local storage
+                localStorage.setItem("token", data_token);
+
                 window.alert("Login successful");
                 router.push("/dashboard");
             }

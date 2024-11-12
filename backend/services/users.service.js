@@ -52,8 +52,6 @@ module.exports = {
 			},
 			async handler(ctx) {
 				const user = ctx.params;
-				this.logger.info("User to create:", user);
-	
 				// Check if the email is already in use
 				const found = await this.adapter.findOne({ where: { email: user.email } });
 	
@@ -68,7 +66,6 @@ module.exports = {
 				const json = doc.toJSON();
 	
 				const entity = this.transformEntity(json, true, ctx.meta.token);
-				this.logger.info("Entity created:", entity);
 	
 				return entity;
 			}
@@ -81,7 +78,6 @@ module.exports = {
 				password: "string"
 			},
 			async handler(ctx) {
-				this.logger.info("Attempting login:", ctx.params);
 
 				const { email, password } = ctx.params;
 				const user = await this.adapter.findOne({ where: { email } });
@@ -100,9 +96,6 @@ module.exports = {
 
 				// Transform and return user data with token
 				const entity = this.transformEntity(json, true, ctx.meta.token);
-
-				this.logger.info("Entity TOKEN:", entity.user.token);
-				this.logger.info("Entity created:", entity);
 				return entity;
 				
 			}
@@ -117,6 +110,7 @@ module.exports = {
 		 * @returns {Object} Resolved user
 		 */
 		resolveToken: {
+			rest: "POST /resolve",
 			cache: {
 				keys: ["token"],
 				ttl: 60 * 60 // 1 hour
@@ -125,6 +119,7 @@ module.exports = {
 				token: "string"
 			},
 			async handler(ctx) {
+				this.logger.info("Resolving token:", ctx.params.token);
 				const decoded = await new this.Promise((resolve, reject) => {
 					jwt.verify(ctx.params.token, this.settings.JWT_SECRET, (err, decoded) => {
 						if (err)
