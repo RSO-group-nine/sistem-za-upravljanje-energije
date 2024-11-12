@@ -9,13 +9,11 @@ export default function GptPrompt() {
         e.preventDefault();
         if (prompt === '') {
             setError("Prompt cannot be empty");
-            console.log(error);
             window.alert(error);
             return;
         }
         setError('');
         const bod = JSON.stringify({ prompt });
-        console.log('Body:', bod);
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/gpt/prompt`, {
             method: 'POST',
             headers: {
@@ -30,7 +28,6 @@ export default function GptPrompt() {
             return;
         }else{
             const data = await res.json();
-            console.log("data:", data);
             setResponse(data);
         }
     };

@@ -12,6 +12,8 @@ export interface SideBarProps {
 export default function SideBar({ options, onSelect }: SideBarProps) {
     const [selectedOption, setSelectedOption] = useState(options[0]);
     const router = useRouter();
+    const email = sessionStorage.getItem("email");
+    const userId = sessionStorage.getItem("userId");
 
     const handleOptionClick = (option: string) => {
         setSelectedOption(option);
@@ -19,12 +21,17 @@ export default function SideBar({ options, onSelect }: SideBarProps) {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("email");
+        sessionStorage.removeItem("userId");
         router.push("/login");
     };
 
     return (
         <aside className="bg-white text-gray-800 w-64 h-screen shadow-lg flex flex-col">
+            <div className="text-neutral-500 p-4 bg-blue-100 flex justify-center items-center rounded-md shadow-lg m-4">
+                <h1 className="font-bold">{email}</h1>
+            </div>
             <nav className="flex-grow">
                 <h1 className="text-3xl font-bold text-blue-500 p-6 border-b border-gray-200">Devices</h1>
                 <ul className="flex flex-col mt-4">

@@ -1,25 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import verifyUser from '@/app/utils/jwtHandler'
  
 // 1. Specify protected and public routes
 const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login', '/register', '/']
  
 export default async function middleware(req: NextRequest) {
+
+  console.log("middleware called")
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname
   const isProtectedRoute = protectedRoutes.includes(path)
   const isPublicRoute = publicRoutes.includes(path)
 
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
  
   // 3. Decrypt the session from the cookie
   let session = null
   try {
     // 4. Decode the JWT token to get the user session
     if (token) {
-      session = jwt.verify(token, process.env.JWT_SECRET || 'jwt-conduit-secret')
+      session = verifyUser(token)
     }
   } catch (error) {
     // Invalid or expired token
@@ -47,5 +49,7 @@ export default async function middleware(req: NextRequest) {
  
 // Routes Middleware should not run on
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  api: {
+    externalResolver: true,
+  },
 }

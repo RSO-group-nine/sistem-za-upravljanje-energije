@@ -9,14 +9,14 @@ export default function LoginForm() {
 
     useEffect(() => {
         const checkUser = async () => {
-            const token = localStorage.getItem('token')
-            if (token == null) {
-                return
+            const token = sessionStorage.getItem('token')
+            if (token == null) {  
+                
             }
-            const userId = await verifyUser(token as string)
-            console.log("User ID:", userId)
-            if (userId != null) {
-                console.log("User is already logged in")
+            const user = await verifyUser(token as string)
+            if (user != null) {
+                sessionStorage.setItem('userId', user.id)
+                sessionStorage.setItem('email', user.email)
                 router.push('/dashboard')
             }
         }
@@ -37,7 +37,6 @@ export default function LoginForm() {
                 body: JSON.stringify({ email, password }),
             });
             if (!response.ok) {
-                console.log(response);
                 window.alert("Login failed");
                 return;
             }else {
@@ -46,7 +45,9 @@ export default function LoginForm() {
                 const data_token = data.user.token;
 
                 //save token to local storage
-                localStorage.setItem("token", data_token);
+                sessionStorage.setItem("token", data_token);
+                sessionStorage.setItem("email", data.user.email);
+                sessionStorage.setItem("userId", data.user.id);
 
                 window.alert("Login successful");
                 router.push("/dashboard");

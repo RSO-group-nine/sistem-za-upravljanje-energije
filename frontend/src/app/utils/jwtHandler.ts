@@ -9,13 +9,12 @@ export default async function verifyUser(token: string) {
         });
 
         if (!response.ok) {
-            console.log(response);
             return null;
 
         }
-        const data = await response.json();
-        console.log("entity:", data);
-        return data.id;
+        const user = await response.json();
+        
+        return user;
     } catch (e) {
         console.error("An error has occured:", e);
 

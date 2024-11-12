@@ -81,7 +81,6 @@ module.exports = {
 
 				const { email, password } = ctx.params;
 				const user = await this.adapter.findOne({ where: { email } });
-				const json = user.toJSON();
 
 				if (!user) {
 					throw new MoleculerClientError("User not found", 404, "", [{ field: "email", message: "is not found" }]);
@@ -95,6 +94,7 @@ module.exports = {
 
 
 				// Transform and return user data with token
+				const json = user.toJSON();
 				const entity = this.transformEntity(json, true, ctx.meta.token);
 				return entity;
 				
