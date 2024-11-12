@@ -1,22 +1,41 @@
 "use client";
-import { useState } from "react";
+import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegistrationForm() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+    const router = useRouter();
 
-    const handleRegistration = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleRegistration = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            console.log(error);
-            window.alert(error);
+            window.alert('Passwords do not match');
             return;
         }
-        setError('');
-        console.log('Registering with:', { email, password });
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+                window.alert("Registration successful");
+                console.log("entity:", data);
+                
+                router.push("/dashboard");
+
+            } catch (e) {
+            console.error("An error has occured:", e);
+
+        }          
     };
     
     return (
@@ -27,8 +46,7 @@ export default function RegistrationForm() {
                     <label className="block mb-2 text-sm font-medium text-gray-600">Email</label>
                     <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="email"
                     className="w-full px-4 py-2  border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Enter your email"
                     required
@@ -38,8 +56,8 @@ export default function RegistrationForm() {
                     <label className="block mb-2 text-sm font-medium text-gray-600">Set password</label>
                     <input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
+                    min={6}
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Enter your password"
                     required
@@ -49,8 +67,7 @@ export default function RegistrationForm() {
                     <label className="block mb-2 text-sm font-medium text-gray-600">Confirm password</label>
                     <input
                     type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    name="confirmPassword"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Confirm your password"
                     required

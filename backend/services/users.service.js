@@ -1,8 +1,10 @@
 "use strict";
-
+const { MoleculerClientError } = require("moleculer").Errors;
 const DbService = require("moleculer-db");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
-const { Sequelize, DataTypes, where } = require("sequelize");
+const { Sequelize, DataTypes, where, json } = require("sequelize");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 /**
  * @typedef {import('moleculer').Context} Context
@@ -16,6 +18,7 @@ module.exports = {
 
 	// Use Sequelize adapter for PostgreSQL
 	adapter: new SqlAdapter(process.env.POSTGRES_URI),
+
 	model: {
 		// Define the model for PostgreSQL using Sequelize DataTypes
 		name: "user",
@@ -31,6 +34,7 @@ module.exports = {
 	},
 
 	settings: {
+		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret", // JWT secret key
 		// Validation rules for actions
 		entityValidator: {
 			email: { type: "email" },
@@ -40,60 +44,134 @@ module.exports = {
 
 	actions: {
 		// Create a new user
-		create: {
+		userRegister: {
+			rest: "POST /register",
 			params: {
 				email: "email",
 				password: "string|min:6"
 			},
 			async handler(ctx) {
 				const user = ctx.params;
-				return await this.adapter.insert(user);
+				this.logger.info("User to create:", user);
+	
+				// Check if the email is already in use
+				const found = await this.adapter.findOne({ where: { email: user.email } });
+	
+				if (found) {
+					throw new MoleculerClientError("Email already in use", 422, "", [{ field: "email", message: "is already in use" }]);
+				}
+	
+				// Hash the password before saving it to the database
+				user.password = await bcrypt.hash(user.password, 10);
+	
+				const doc = await this.adapter.insert(user);
+				const json = doc.toJSON();
+	
+				const entity = this.transformEntity(json, true, ctx.meta.token);
+				this.logger.info("Entity created:", entity);
+	
+				return entity;
 			}
 		},
 
-		// Retrieve a user by ID
-		verifyUser: {
-            rest: "POST /verify",
+		userLogin: {
+			rest: "POST /login",
 			params: {
 				email: "email",
-                password: "string"
+				password: "string"
 			},
 			async handler(ctx) {
-                this.logger.info('Verify user:', ctx.params);
-				const user = await this.adapter.findOne({where: ctx.params});
+				this.logger.info("Attempting login:", ctx.params);
 
-                if (!user) {
-                    return { error: "User not found", status: 404 };
-                }
-                return { user: user, status: 200 };
+				const { email, password } = ctx.params;
+				const user = await this.adapter.findOne({ where: { email } });
+				const json = user.toJSON();
+
+				if (!user) {
+					throw new MoleculerClientError("User not found", 404, "", [{ field: "email", message: "is not found" }]);
+				}
+
+				// Verify the password
+				const match = await bcrypt.compare(password, user.password);
+				if (!match) {
+					throw new MoleculerClientError("Invalid password", 401, "", [{ field: "password", message: "is incorrect" }]);
+				}
+
+
+				// Transform and return user data with token
+				const entity = this.transformEntity(json, true, ctx.meta.token);
+
+				this.logger.info("Entity TOKEN:", entity.user.token);
+				this.logger.info("Entity created:", entity);
+				return entity;
+				
 			}
 		},
 
-		// Update an existing user
-		update: {
+		/**
+		 * Get user by JWT token (for API GW authentication)
+		 *
+		 * @actions
+		 * @param {String} token - JWT token
+		 *
+		 * @returns {Object} Resolved user
+		 */
+		resolveToken: {
+			cache: {
+				keys: ["token"],
+				ttl: 60 * 60 // 1 hour
+			},
 			params: {
-				id: "string",
-				email: { type: "email", optional: true },
-				password: { type: "string", optional: true, min: 6 }
+				token: "string"
 			},
 			async handler(ctx) {
-				const { id, ...updates } = ctx.params;
-				return await this.adapter.updateById(id, { $set: updates });
+				const decoded = await new this.Promise((resolve, reject) => {
+					jwt.verify(ctx.params.token, this.settings.JWT_SECRET, (err, decoded) => {
+						if (err)
+							return reject(err);
+
+						resolve(decoded);
+					});
+				});
+
+				if (decoded.id)
+					return this.getById(decoded.id);
 			}
 		},
-
-		// Delete a user
-		remove: {
-			params: {
-				id: "string"
-			},
-			async handler(ctx) {
-				return await this.adapter.removeById(ctx.params.id);
-			}
-		}
 	},
 
 	methods: {
+				/**
+		 * Generate a JWT token from user entity
+		 *
+		 * @param {Object} user
+		 */
+				generateJWT(user) {
+					const today = new Date();
+					const exp = new Date(today);
+					exp.setDate(today.getDate() + 60);
+		
+					return jwt.sign({
+						id: user.id,
+						username: user.username,
+						exp: Math.floor(exp.getTime() / 1000)
+					}, this.settings.JWT_SECRET);
+				},
+		
+				/**
+				 * Transform returned user entity. Generate JWT token if neccessary.
+				 *
+				 * @param {Object} user
+				 * @param {Boolean} withToken
+				 */
+				transformEntity(user, withToken, token) {
+					if (user) {
+						if (withToken)
+							user.token = token || this.generateJWT(user);
+					}
+		
+					return { user };
+				},
 		/**
 		 * Seed the DB with initial users.
 		 */

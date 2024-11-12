@@ -1,16 +1,18 @@
-"use client";
-import { useState } from "react";
+'use client'
+import { FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
+        const formData = new FormData(e.currentTarget)
+        const email = formData.get('email')
+        const password = formData.get('password')
+
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/verify`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -18,21 +20,21 @@ export default function LoginForm() {
                 body: JSON.stringify({ email, password })
             });
             if (!response.ok) {
-                setError("An error has occured");
+                console.log(response);
+                window.alert("Login failed");
                 return;
             }else {
-                const r = await response.json();
-                if (r.status != 200) {
-                    window.alert(r.error);
-                    
-                }else {
-                    window.alert("Login successful");
-                    console.log(r);
-                }
+                //get response metadata
+                const data = await response.json();
+                const token = data.user.token;
+
+                console.log("token:", token);
+                window.alert("Login successful");
+                router.push("/dashboard");
             }
-        } catch (error) {
-            console.error("An error has occured:", error);
-            setError("An error has occured");
+        } catch (e) {
+            console.error("An error has occured:", e);
+
         }          
     };
     return (
@@ -43,8 +45,7 @@ export default function LoginForm() {
                     <label className="block mb-2 text-sm font-medium text-gray-600">Email</label>
                     <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="email"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Enter your email"
                     required
@@ -54,8 +55,7 @@ export default function LoginForm() {
                     <label className="block mb-2 text-sm font-medium text-gray-600">Password</label>
                     <input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Enter your password"
                     required
