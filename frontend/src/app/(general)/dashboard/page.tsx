@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import SideBar from "./components/sideBar";
-import Light from "./components/light";
+import SideBar from "../components/sideBar";
+import Light from "../components/light";
 
 export default function Page() {
     const [selectedOption, setSelectedOption] = useState("Light");
