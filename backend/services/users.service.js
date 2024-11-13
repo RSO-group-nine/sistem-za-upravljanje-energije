@@ -96,6 +96,9 @@ module.exports = {
 				// Transform and return user data with token
 				const json = user.toJSON();
 				const entity = this.transformEntity(json, true, ctx.meta.token);
+				const token = entity.user.token;
+				ctx.meta.$responseHeaders = {"Set-Cookie":`token=${token}; HttpOnly; Secure; Path=/; Max-Age=86400; SameSite=Strict`};
+				
 				return entity;
 				
 			}

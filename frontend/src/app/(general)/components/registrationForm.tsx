@@ -7,21 +7,21 @@ import { useEffect } from "react";
 export default function RegistrationForm() {
     const router = useRouter();
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const token = sessionStorage.getItem('token')
-            if (token == null) {  
+    // useEffect(() => {
+    //     const checkUser = async () => {
+    //         const token = sessionStorage.getItem('token')
+    //         if (token == null) {  
                 
-            }
-            const user = await verifyUser(token as string)
-            if (user != null) {
-                sessionStorage.setItem('userId', user.id)
-                sessionStorage.setItem('email', user.email)
-                router.push('/dashboard')
-            }
-        }
-        checkUser();
-    }, [])
+    //         }
+    //         const user = await verifyUser(token as string)
+    //         if (user != null) {
+    //             sessionStorage.setItem('userId', user.id)
+    //             sessionStorage.setItem('email', user.email)
+    //             router.push('/dashboard')
+    //         }
+    //     }
+    //     checkUser();
+    // }, [])
 
     const handleRegistration = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();

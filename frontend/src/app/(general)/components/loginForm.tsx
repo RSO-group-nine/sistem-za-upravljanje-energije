@@ -7,21 +7,21 @@ import { useEffect } from 'react';
 export default function LoginForm() {
     const router = useRouter();
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const token = sessionStorage.getItem('token')
-            if (token == null) {  
+    // useEffect(() => {
+    //     const checkUser = async () => {
+    //         const token = sessionStorage.getItem('token')
+    //         if (token == null) {  
                 
-            }
-            const user = await verifyUser(token as string)
-            if (user != null) {
-                sessionStorage.setItem('userId', user.id)
-                sessionStorage.setItem('email', user.email)
-                router.push('/dashboard')
-            }
-        }
-        checkUser();
-    }, [])
+    //         }
+    //         const user = await verifyUser(token as string)
+    //         if (user != null) {
+    //             sessionStorage.setItem('userId', user.id)
+    //             sessionStorage.setItem('email', user.email)
+    //             router.push('/dashboard')
+    //         }
+    //     }
+    //     checkUser();
+    // }, [])
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -31,8 +31,10 @@ export default function LoginForm() {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/login`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    
                 },
                 body: JSON.stringify({ email, password }),
             });
@@ -40,14 +42,6 @@ export default function LoginForm() {
                 window.alert("Login failed");
                 return;
             }else {
-                //get response metadata
-                const data = await response.json();
-                const data_token = data.user.token;
-
-                //save token to local storage
-                sessionStorage.setItem("token", data_token);
-                sessionStorage.setItem("email", data.user.email);
-                sessionStorage.setItem("userId", data.user.id);
 
                 window.alert("Login successful");
                 router.push("/dashboard");

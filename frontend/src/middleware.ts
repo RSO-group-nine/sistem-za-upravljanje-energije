@@ -1,44 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import verifyUser from '@/app/utils/jwtHandler'
- 
+import { cookies } from 'next/headers'
+import verifyUser from './app/utils/jwtHandler'
+
 // 1. Specify protected and public routes
 const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login', '/register', '/']
  
 export default async function middleware(req: NextRequest) {
-
-  console.log("middleware called")
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname
+
+  if (path === "/") {
+    return NextResponse.redirect(new URL('/login', req.nextUrl))
+
+  }
   const isProtectedRoute = protectedRoutes.includes(path)
   const isPublicRoute = publicRoutes.includes(path)
-
-
-  const token = sessionStorage.getItem('token');
  
   // 3. Decrypt the session from the cookie
-  let session = null
-  try {
-    // 4. Decode the JWT token to get the user session
-    if (token) {
-      session = verifyUser(token)
-    }
-  } catch (error) {
-    // Invalid or expired token
-    console.error('Invalid or expired token:', error)
-  }
-
-  console.log('session:', session)
+  const token = (await cookies()).get('token')?.value
+  const session = token ? await verifyUser(token) : null
  
   // 4. Redirect to /login if the user is not authenticated
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !session?.id) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
   }
  
   // 5. Redirect to /dashboard if the user is authenticated
   if (
     isPublicRoute &&
-    session &&
+    session?.id &&
     !req.nextUrl.pathname.startsWith('/dashboard')
   ) {
     return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
@@ -49,7 +40,5 @@ export default async function middleware(req: NextRequest) {
  
 // Routes Middleware should not run on
 export const config = {
-  api: {
-    externalResolver: true,
-  },
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 }

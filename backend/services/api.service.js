@@ -34,7 +34,7 @@ module.exports = {
 					"**"
 				],
 				cors: {
-					origin: ["*"], // Allow all origins for testing purposes
+					origin: ["http://localhost:3000"], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
 					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
 					exposedHeaders: [],
