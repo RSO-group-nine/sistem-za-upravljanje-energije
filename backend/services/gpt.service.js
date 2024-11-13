@@ -40,7 +40,6 @@ module.exports = {
 			},
 			/** @param {Context} ctx  */
 			async handler(ctx) {
-                console.log('Prompt:', ctx.params.prompt);
 				try {
 					const promptResponse = await helpers.generatePrompt(ctx.params.prompt);
 
