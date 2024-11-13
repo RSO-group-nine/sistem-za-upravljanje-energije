@@ -34,7 +34,7 @@ module.exports = {
 	},
 
 	settings: {
-		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret", // JWT secret key
+		JWT_SECRET: process.env.JWT_SECRET || "jwt-placeholder-secret", // JWT secret key
 		// Validation rules for actions
 		entityValidator: {
 			email: { type: "email" },
