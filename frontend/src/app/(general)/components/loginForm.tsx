@@ -24,7 +24,11 @@ export default function LoginForm() {
                 window.alert("Login failed");
                 return;
             }else {
-
+                const data = await response.json();
+                const user = data.user;
+                const email = user.email;
+                sessionStorage.setItem("email", email);
+                sessionStorage.setItem("id", user.id);
                 window.alert("Login successful");
                 router.push("/dashboard");
             }

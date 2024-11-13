@@ -2,16 +2,18 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaSignOutAlt } from "react-icons/fa";
+import getDevices from "@/app/utils/getDevices";
 
 export interface SideBarProps {
-    options: string[];
     onSelect: (option: string) => void;
 }
 
-
-export default function SideBar({ options, onSelect }: SideBarProps) {
-    const [selectedOption, setSelectedOption] = useState(options[0]);
+export default function SideBar({ onSelect }: SideBarProps) {
     const router = useRouter();
+    const [email, setEmail] = useState<string>("");
+    const [id, setId] = useState<string>("");
+    const [devices, setDevices] = useState<{ device_id: string }[]>([]);
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
     const handleOptionClick = (option: string) => {
         setSelectedOption(option);
@@ -19,26 +21,50 @@ export default function SideBar({ options, onSelect }: SideBarProps) {
     };
 
     const handleLogout = () => {
+        sessionStorage.removeItem("email");
+        sessionStorage.removeItem("id");
         router.push("/login");
     };
+
+    const handleGetDevices = async (userId: string) => {
+        try {
+            const devices = await getDevices(userId);
+            if (devices && devices.length > 0) {
+                setDevices(devices);
+                setSelectedOption(devices[0].device_id); // Set the first device as the default selected option
+            }
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    };
+
+    useEffect(() => {
+        const emailFromStorage = sessionStorage.getItem("email") ?? "";
+        const idFromStorage = sessionStorage.getItem("id") ?? "";
+        setEmail(emailFromStorage);
+        setId(idFromStorage);
+        if (idFromStorage) {
+            handleGetDevices(idFromStorage);
+        }
+    }, []); // Empty dependency array to run this once when the component mounts
 
     return (
         <aside className="bg-white text-gray-800 w-64 h-screen shadow-lg flex flex-col">
             <div className="text-neutral-500 p-4 bg-blue-100 flex justify-center items-center rounded-md shadow-lg m-4">
-                <h1 className="font-bold">TODO</h1>
+                <h1 className="font-bold">{email}</h1>
             </div>
             <nav className="flex-grow">
                 <h1 className="text-3xl font-bold text-blue-500 p-6 border-b border-gray-200">Devices</h1>
                 <ul className="flex flex-col mt-4">
-                    {options.map((option) => (
+                    {devices.map((device) => (
                         <li
-                            key={option}
+                            key={device.device_id}
                             className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
-                                option === selectedOption ? "bg-blue-400 text-white" : "hover:bg-blue-100"
+                                device.device_id === selectedOption ? "bg-blue-400 text-white" : "hover:bg-blue-100"
                             }`}
-                            onClick={() => handleOptionClick(option)}
+                            onClick={() => handleOptionClick(device.device_id)}
                         >
-                            {option}
+                            {device.device_id}
                         </li>
                     ))}
                 </ul>

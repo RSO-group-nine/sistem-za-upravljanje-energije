@@ -23,7 +23,7 @@ module.exports = {
 		// Define the model for PostgreSQL using Sequelize DataTypes
 		name: "user",
 		define: {
-			id: { type: DataTypes.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+			id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 			email: { type: DataTypes.STRING, allowNull: false, unique: true },
 			password: { type: DataTypes.STRING, allowNull: false }
 		},
@@ -103,7 +103,6 @@ module.exports = {
 				
 			}
 		},
-
 		/**
 		 * Get user by JWT token (for API GW authentication)
 		 *
@@ -137,7 +136,23 @@ module.exports = {
 			}
 		},
 	},
+	getUserById: {
+		rest: "GET /:user_id",
+		async handler(ctx) {
+			const user_id = ctx.params.user_id;
+			this.logger.info(`Fetching user with ID: ${user_id}`);
 
+			const user = await this.getById(user_id);
+
+			this.logger.info(`User found: ${user}`);
+
+			if (!user) {
+				throw new MoleculerClientError("User not found", 404);
+			}
+
+			return user;
+		},
+	},
 	methods: {
 				/**
 		 * Generate a JWT token from user entity
