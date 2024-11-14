@@ -3,8 +3,12 @@ const { MoleculerClientError } = require("moleculer").Errors;
 const DbService = require("moleculer-db");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
 const { Sequelize, DataTypes, where, json } = require("sequelize");
-const Client = require('azure-iot-device').Client;
+const Registry = require('azure-iothub').Registry;
+const Client = require('azure-iothub').Client;
+
+const DeviceClient = require('azure-iot-device').Client;
 const Protocol = require('azure-iot-device-mqtt').Mqtt;
+
 /**
  * @typedef {import('moleculer').Context} Context
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema
@@ -24,6 +28,7 @@ module.exports = {
 		define: {
 			device_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 			user_email: { type: DataTypes.STRING, allowNull: false, unique: false },
+			az_connection_string: { type: DataTypes.STRING, allowNull: false, unique: true },
 		},
 		options: {
 			// Additional options for Sequelize model
@@ -41,7 +46,7 @@ module.exports = {
 
 	actions: {
 		// Create a new user
-		getDevices: {
+		getUserDevices: {
 			rest: "GET /:user_id",
 			// Use GET for fetching data
 			async handler(ctx) {
@@ -73,13 +78,98 @@ module.exports = {
 				return {devices, user}; 
 			},
 		},
+		getDeviceInfo: {
+			rest : "POST /info",
+			params: {
+				id: "number"
+			},
+
+			async handler(ctx) {
+				let device_id = ctx.params.id;
+				this.logger.info(`Fetching device info for device with ID: ${device_id}`);
+				let device = await this.adapter.findById(device_id);
+				if (!device) {
+					throw new MoleculerClientError("Device not found", 404);
+				}
+				let data = device.toJSON();
+				let connection_string = data.az_connection_string;
+				this.logger.info(`Fetching device info for device with connection string: ${connection_string}`);
+				let deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
+				this.logger.info('Device client created');
+				let s = "HostName=RSO-group-09.azure-devices.net;SharedAccessKeyName=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U="
+				let client = Client.fromConnectionString(s);
+				this.logger.info('IotHub client created');
+				let registry = Registry.fromConnectionString(s);
+
+				let methodName = 'reboot';
+				let deviceToReboot = data.device_id;
+
+				let methodParams = {
+					methodName: methodName,
+					payload: null,
+					timeoutInSeconds: 30
+				};
+
+				deviceClient.open((err) => {
+					if (err) {
+						this.logger.error('could not open IotHub client');
+					} else {
+						this.logger.info('IotHub client opened');
+						deviceClient.onDeviceMethod('reboot', this.onReboot);
+						this.logger.info('Device method registered');
+					}
+				});
+
+				client.invokeDeviceMethod(deviceToReboot, methodParams, (err, result) => {
+					if (err) {
+						this.logger.error('could not invoke method' + err);
+					} else {
+						this.logger.info('Method invoked');
+					}
+				});
+
+				return {"hellow":"world"};
+
+			}
+		},
 	},
 
-	methods: {
+
+
+	methods: {		
+		async onReboot(client) {
+
+			this.logger.info("Rebooting device...");
+
+			let date = new Date();
+
+			let patch = {
+				iothubDM : {
+					reboot : {
+						lastReboot : date.toISOString(),
+					}
+				}
+			};
+
+			client.getTwin(function(err, twin) {
+				if (err) {
+					this.logger.error('could not get twin');
+				} else {
+					console.log('twin acquired');
+					twin.properties.reported.update(patch, function(err) {
+						if (err) throw err;
+						this.logger.info('Device reboot twin state reported')
+					});  
+				}
+			});
+		
+			this.logger.info('Rebooting!');
+		},
+
+
 		async seedDB() {
 			await this.adapter.insertMany([
-				{ user_email: "rok.rajher8@gmail.com" },
-				{ user_email: "rok.rajher8@gmail.com" },
+				{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U="},
 			]);
 		}
     },
@@ -88,7 +178,7 @@ module.exports = {
         // Initialize the associations after the service has started
 		await this.adapter.model.sync();
 		// Seed the database with some initial data
-		await this.seedDB();
+		// await this.seedDB();
 		// Log a message to the console
         this.logger.info("Device service started!");
     },

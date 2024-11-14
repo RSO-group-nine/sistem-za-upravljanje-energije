@@ -3,22 +3,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaSignOutAlt } from "react-icons/fa";
 import getUserDevices from "@/app/utils/getUserDevices";
+import Device from "@/app/entities/device";
 
 export interface SideBarProps {
-    onSelect: (option: string) => void;
+    onSelect: (device: Device) => void;
 }
 
 export default function SideBar({ onSelect }: SideBarProps) {
     const router = useRouter();
     const [email, setEmail] = useState<string>("");
     const [id, setId] = useState<string>("");
-    const [devices, setDevices] = useState<{ device_id: string }[]>([]);
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
-
-    const handleOptionClick = (option: string) => {
-        setSelectedOption(option);
-        onSelect(option); // Trigger the callback with the selected option
-    };
+    const [devices, setDevices] = useState<Device[]>([]);
+    const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
 
     const handleLogout = () => {
         sessionStorage.removeItem("email");
@@ -31,7 +27,7 @@ export default function SideBar({ onSelect }: SideBarProps) {
             const devices = await getUserDevices(userId);
             if (devices && devices.length > 0) {
                 setDevices(devices);
-                setSelectedOption(devices[0].device_id); // Set the first device as the default selected option
+                setSelectedDevice(devices[0]); // Set the first device as the default selected Device
             }
         } catch (error) {
             console.error('Error fetching devices:', error);
@@ -60,9 +56,9 @@ export default function SideBar({ onSelect }: SideBarProps) {
                         <li
                             key={device.device_id}
                             className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
-                                device.device_id === selectedOption ? "bg-blue-400 text-white" : "hover:bg-blue-100"
+                                device.device_id === selectedDevice?.device_id ? "bg-blue-400 text-white" : "hover:bg-blue-100"
                             }`}
-                            onClick={() => handleOptionClick(device.device_id)}
+                            onClick={() => onSelect(device)}
                         >
                             {device.device_id}
                         </li>

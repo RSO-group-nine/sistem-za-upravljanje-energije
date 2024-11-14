@@ -1,24 +1,25 @@
 "use client";
 import { useState } from "react";
 import SideBar from "../components/sideBar";
-import Light from "../components/light";
+import DeviceComponent from "../components/deviceComponent";
+import Device from "@/app/entities/device";
 
 export default function Page() {
-    const [selectedOption, setSelectedOption] = useState("Light");
+    const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
 
-    // Update the selected option
-    const handleOptionSelect = (option: string) => {
-        setSelectedOption(option);
-        console.log(option);
+    // Update the selected device
+    const handleDeviceSelect = (device: Device) => {
+        setSelectedDevice(device);
+        console.log(device);
     };
 
     return (
         <div className="flex">
           <div className="">
-            <SideBar onSelect={handleOptionSelect} />
+            <SideBar onSelect={handleDeviceSelect} />
           </div>
             <main className="p-8 bg-white w-full">
-                {selectedOption == "1" && <Light />}
+                {selectedDevice?.device_id == 1 && <DeviceComponent device={selectedDevice} />}
             </main>
         </div>
     );
