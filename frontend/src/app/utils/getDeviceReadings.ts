@@ -5,7 +5,7 @@ export interface Props {
 }
 
 export default async function getDeviceReadings(device: Device) {
-    const az_connection_string = device.az_connection_string;
+    const az_device_id = device.az_device_id;
     const id = device.device_id;
     console.log('Device id:', id);
     try {

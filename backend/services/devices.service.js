@@ -29,6 +29,7 @@ module.exports = {
 			device_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 			user_email: { type: DataTypes.STRING, allowNull: false, unique: false },
 			az_connection_string: { type: DataTypes.STRING, allowNull: false, unique: true },
+			az_device_id: { type: DataTypes.STRING, allowNull: false, unique: true },
 		},
 		options: {
 			// Additional options for Sequelize model
@@ -49,6 +50,9 @@ module.exports = {
 		getUserDevices: {
 			rest: "GET /:user_id",
 			// Use GET for fetching data
+			params: {
+				user_id: "string",
+			},
 			async handler(ctx) {
 				this.logger.info("Fetching devices for user with ID: ", ctx.params.user_id);
 				const user_id = ctx.params.user_id;
@@ -81,7 +85,7 @@ module.exports = {
 		getDeviceInfo: {
 			rest : "POST /info",
 			params: {
-				id: "number"
+				id: "number",
 			},
 		
 			async handler(ctx) {
@@ -103,7 +107,7 @@ module.exports = {
 				const registry = Registry.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
 		
 				const methodName = 'reboot';
-				const deviceToReboot = "device1";
+				const deviceToReboot = data.az_device_id;
 				const methodParams = {
 					methodName,
 					payload: null,
@@ -177,17 +181,19 @@ module.exports = {
 			},
 		
 			async seedDB() {
-				await this.adapter.insertMany([
-					{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U=" },
-				]);
+				const existingDevice = await this.adapter.findOne({ where: { user_email: "rok.rajher8@gmail.com" } });
+				if (!existingDevice) {
+					await this.adapter.insertMany([
+						{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U=", az_device_id: "device1" },
+					]);
+				}
 			}
 		},
-		
     async started() {
         // Initialize the associations after the service has started
 		await this.adapter.model.sync();
 		// Seed the database with some initial data
-		// await this.seedDB();
+		await this.seedDB();
 		// Log a message to the console
         this.logger.info("Device service started!");
     },
