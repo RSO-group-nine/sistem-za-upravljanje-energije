@@ -96,10 +96,9 @@ module.exports = {
 				this.logger.info(`Fetching device info for device with connection string: ${connection_string}`);
 				let deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
 				this.logger.info('Device client created');
-				let s = "HostName=RSO-group-09.azure-devices.net;SharedAccessKeyName=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U="
-				let client = Client.fromConnectionString(s);
+				let client = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
 				this.logger.info('IotHub client created');
-				let registry = Registry.fromConnectionString(s);
+				let registry = Registry.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
 
 				let methodName = 'reboot';
 				let deviceToReboot = data.device_id;
