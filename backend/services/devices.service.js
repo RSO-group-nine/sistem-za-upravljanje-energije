@@ -83,96 +83,106 @@ module.exports = {
 			params: {
 				id: "number"
 			},
-
+		
 			async handler(ctx) {
-				let device_id = ctx.params.id;
+				const device_id = ctx.params.id;
 				this.logger.info(`Fetching device info for device with ID: ${device_id}`);
-				let device = await this.adapter.findById(device_id);
+				const device = await this.adapter.findById(device_id);
+		
 				if (!device) {
 					throw new MoleculerClientError("Device not found", 404);
 				}
-				let data = device.toJSON();
-				let connection_string = data.az_connection_string;
-				this.logger.info(`Fetching device info for device with connection string: ${connection_string}`);
-				let deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
-				this.logger.info('Device client created');
-				let client = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
-				this.logger.info('IotHub client created');
-				let registry = Registry.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
-
-				let methodName = 'reboot';
-				let deviceToReboot = data.device_id;
-
-				let methodParams = {
-					methodName: methodName,
+		
+				const data = device.toJSON();
+				const connection_string = data.az_connection_string;
+				this.logger.info(`Fetching device info with connection string: ${connection_string}`);
+				
+				// Initialize the DeviceClient and IoT Hub Client at the service level
+				this.deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
+				const client = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
+				const registry = Registry.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
+		
+				const methodName = 'reboot';
+				const deviceToReboot = "device1";
+				const methodParams = {
+					methodName,
 					payload: null,
 					timeoutInSeconds: 30
 				};
-
-				deviceClient.open((err) => {
+		
+				// Open device client
+				this.deviceClient.open((err) => {
 					if (err) {
-						this.logger.error('could not open IotHub client');
+						this.logger.error('Could not open IoT Hub device client:', err.message);
 					} else {
-						this.logger.info('IotHub client opened');
-						deviceClient.onDeviceMethod('reboot', this.onReboot);
-						this.logger.info('Device method registered');
+						this.logger.info('IoT Hub device client opened');
+						try {
+							this.deviceClient.onDeviceMethod('reboot', this.onReboot.bind(this));
+							this.logger.info('Device method registered');
+						} catch (error) {
+							this.logger.error('Could not register device method:', error.message);
+						}	
 					}
 				});
-
-				client.invokeDeviceMethod(deviceToReboot, methodParams, (err, result) => {
+		
+				// Open IoT Hub client and invoke method
+				client.open((err) => {
 					if (err) {
-						this.logger.error('could not invoke method' + err);
+						this.logger.error('Could not open IoT Hub client:', err.message);
 					} else {
-						this.logger.info('Method invoked');
+						this.logger.info('IoT Hub client opened');
+						client.invokeDeviceMethod(deviceToReboot, methodParams, (err, result) => {
+							if (err) {
+								this.logger.error('Could not invoke method:', err.message);
+							} else {
+								this.logger.info('Method invoked successfully', result);
+							}
+						});
 					}
 				});
-
-				return {"hellow":"world"};
-
+		
+				return { message: "Device info retrieved" };
 			}
 		},
 	},
-
-
-
-	methods: {		
-		async onReboot(client) {
-
-			this.logger.info("Rebooting device...");
-
-			let date = new Date();
-
-			let patch = {
-				iothubDM : {
-					reboot : {
-						lastReboot : date.toISOString(),
-					}
-				}
-			};
-
-			client.getTwin(function(err, twin) {
-				if (err) {
-					this.logger.error('could not get twin');
-				} else {
-					console.log('twin acquired');
-					twin.properties.reported.update(patch, function(err) {
-						if (err) throw err;
-						this.logger.info('Device reboot twin state reported')
-					});  
-				}
-			});
 		
-			this.logger.info('Rebooting!');
+		methods: {		
+			async onReboot(request, response) {
+				this.logger.info("Rebooting device...");
+		
+				const date = new Date();
+				const patch = {
+					iothubDM: {
+						reboot: {
+							lastReboot: date.toISOString(),
+						}
+					}
+				};
+		
+				this.deviceClient.getTwin((err, twin) => {
+					if (err) {
+						this.logger.error('Could not get twin:', err.message);
+					} else {
+						this.logger.info('Twin acquired');
+						twin.properties.reported.update(patch, (err) => {
+							if (err) {
+								this.logger.error('Error updating twin properties:', err.message);
+							} else {
+								this.logger.info('Device reboot twin state reported');
+							}
+						});
+					}
+				});
+				this.logger.info('Device reboot initiated!');
+			},
+		
+			async seedDB() {
+				await this.adapter.insertMany([
+					{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U=" },
+				]);
+			}
 		},
-
-
-		async seedDB() {
-			await this.adapter.insertMany([
-				{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U="},
-			]);
-		}
-    },
-
+		
     async started() {
         // Initialize the associations after the service has started
 		await this.adapter.model.sync();
