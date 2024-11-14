@@ -5,6 +5,7 @@ const SqlAdapter = require("moleculer-db-adapter-sequelize");
 const { Sequelize, DataTypes, where, json } = require("sequelize");
 const Registry = require('azure-iothub').Registry;
 const Client = require('azure-iothub').Client;
+const Message = require('azure-iot-device').Message;
 
 const DeviceClient = require('azure-iot-device').Client;
 const Protocol = require('azure-iot-device-mqtt').Mqtt;
@@ -91,110 +92,116 @@ module.exports = {
 			async handler(ctx) {
 				const device_id = ctx.params.id;
 				this.logger.info(`Fetching device info for device with ID: ${device_id}`);
-				const device = await this.adapter.findById(device_id);
 		
-				if (!device) {
-					throw new MoleculerClientError("Device not found", 404);
+				try {
+					// Find device by ID
+					const device = await this.adapter.findById(device_id);
+					if (!device) {
+						throw new MoleculerClientError("Device not found", 404);
+					}
+		
+					const data = device.toJSON();
+					const connection_string = data.az_connection_string;
+					const deviceToReboot = data.az_device_id;
+					this.logger.info(`Using connection string: ${connection_string}`);
+		
+					// Initialize the DeviceClient and IoT Hub Client
+					const deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
+					const serviceClient = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
+					const methodParams = {
+						methodName: 'sendTelemetry',
+						payload: null,
+						timeoutInSeconds: 30,
+					};
+		
+					// Open device client with better error handling
+					// try {
+					// 	await deviceClient.open();
+					// 	this.logger.info('IoT Hub device client opened');
+		
+					// 	// Register the 'sendTelemetry' method
+					// 	deviceClient.onDeviceMethod('sendTelemetry', this.onSendTelemetry.bind(this));
+					// 	this.logger.info('Device method "sendTelemetry" registered successfully');
+					// } catch (err) {
+					// 	this.logger.error('Could not open or register device method on IoT Hub device client:', err.message);
+					// 	throw new MoleculerClientError('Failed to initialize device client', 500);
+					// }
+		
+					// Open service client and invoke method
+					try {
+						await serviceClient.open();
+						this.logger.info('IoT Hub service client opened');
+						
+						this.logger.info("Invoking method on device with ID:", deviceToReboot);
+
+						const result = await serviceClient.invokeDeviceMethod(deviceToReboot, methodParams);
+						
+						this.logger.info('Telemetry successfully sent', result);
+						return { deviceInfo: JSON.parse(result.payload) };
+					} catch (err) {
+						this.logger.error('Error invoking method:', err.message);
+						throw new MoleculerClientError('Failed to invoke method', 500);
+					} finally {
+						await serviceClient.close();
+						this.logger.info('IoT Hub service client closed');
+					}
+				} catch (err) {
+					this.logger.error('Handler error:', err.message);
+					throw err;
 				}
-		
-				const data = device.toJSON();
-				const connection_string = data.az_connection_string;
-				this.logger.info(`Fetching device info with connection string: ${connection_string}`);
-				
-				// Initialize the DeviceClient and IoT Hub Client at the service level
-				this.deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
-				const client = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
-				const registry = Registry.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
-		
-				const methodName = 'reboot';
-				const deviceToReboot = data.az_device_id;
-				const methodParams = {
-					methodName,
-					payload: null,
-					timeoutInSeconds: 30
-				};
-		
-				// Open device client
-				this.deviceClient.open((err) => {
-					if (err) {
-						this.logger.error('Could not open IoT Hub device client:', err.message);
-					} else {
-						this.logger.info('IoT Hub device client opened');
-						try {
-							this.deviceClient.onDeviceMethod('reboot', this.onReboot.bind(this));
-							this.logger.info('Device method registered');
-						} catch (error) {
-							this.logger.error('Could not register device method:', error.message);
-						}	
-					}
-				});
-		
-				// Open IoT Hub client and invoke method
-				client.open((err) => {
-					if (err) {
-						this.logger.error('Could not open IoT Hub client:', err.message);
-					} else {
-						this.logger.info('IoT Hub client opened');
-						client.invokeDeviceMethod(deviceToReboot, methodParams, (err, result) => {
-							if (err) {
-								this.logger.error('Could not invoke method:', err.message);
-							} else {
-								this.logger.info('Method invoked successfully', result);
-							}
-						});
-					}
-				});
-		
-				return { message: "Device info retrieved" };
 			}
 		},
 	},
 		
-		methods: {		
-			async onReboot(request, response) {
-				this.logger.info("Rebooting device...");
+		methods: {
+			// Method to handle the device method call and send telemetry data
+			async onSendTelemetry(request, response) {
+				this.logger.info("Sending telemetry data...");
 		
-				const date = new Date();
-				const patch = {
-					iothubDM: {
-						reboot: {
-							lastReboot: date.toISOString(),
-						}
-					}
-				};
+				// Generate random telemetry data
+				const telemetryData = this.generateRandomTelemetry();
+				this.logger.info("Generated telemetry data:", telemetryData);
 		
-				this.deviceClient.getTwin((err, twin) => {
-					if (err) {
-						this.logger.error('Could not get twin:', err.message);
-					} else {
-						this.logger.info('Twin acquired');
-						twin.properties.reported.update(patch, (err) => {
-							if (err) {
-								this.logger.error('Error updating twin properties:', err.message);
-							} else {
-								this.logger.info('Device reboot twin state reported');
-							}
-						});
-					}
-				});
-				this.logger.info('Device reboot initiated!');
-			},
+				try {
+					// Send telemetry data to IoT Hub
+					await this.deviceClient.sendEvent(new Message(JSON.stringify(telemetryData)));
+					this.logger.info('Telemetry data sent successfully');
 		
-			async seedDB() {
-				const existingDevice = await this.adapter.findOne({ where: { user_email: "rok.rajher8@gmail.com" } });
-				if (!existingDevice) {
-					await this.adapter.insertMany([
-						{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U=", az_device_id: "device1" },
-					]);
+					// Send response back to IoT Hub
+					response.send(200, JSON.stringify(telemetryData));
+					this.logger.info('Response sent successfully');
+				} catch (err) {
+					this.logger.error('Error in onSendTelemetry method:', err.message);
+					response.send(500, { error: "Failed to send telemetry data" });
 				}
-			}
+			},
+
+		// Helper method to generate random telemetry values
+		generateRandomTelemetry() {
+			return {
+				temperature: (Math.random() * 15 + 15).toFixed(2), // Random temperature between 15-30°C
+				humidity: (Math.random() * 50 + 30).toFixed(2),    // Random humidity between 30-80%
+				pressure: (Math.random() * 50 + 950).toFixed(2),   // Random pressure between 950-1000 hPa
+				timestamp: new Date().toISOString(),               // Timestamp
+			};
 		},
-    async started() {
-        // Initialize the associations after the service has started
+		
+		async seedDB() {
+			const existingDevice = await this.adapter.findOne({ where: { user_email: "rok.rajher8@gmail.com" } });
+			if (!existingDevice) {
+				await this.adapter.insertMany([
+					{ user_email: "rok.rajher8@gmail.com", az_connection_string: "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U=", az_device_id: "device1" },
+				]);
+			}
+		}
+	},
+
+	async started() {
+		// Initialize the associations after the service has started
 		await this.adapter.model.sync();
 		// Seed the database with some initial data
 		await this.seedDB();
 		// Log a message to the console
-        this.logger.info("Device service started!");
-    },
+		this.logger.info("Device service started!");
+	},
 };
