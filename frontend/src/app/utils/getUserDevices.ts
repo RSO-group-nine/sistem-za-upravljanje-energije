@@ -1,4 +1,4 @@
-export default async function getDevices(user_id: string) {
+export default async function getUserDevices(user_id: string) {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/devices?userId=${user_id}`, {
             method: 'GET',

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaSignOutAlt } from "react-icons/fa";
-import getDevices from "@/app/utils/getDevices";
+import getUserDevices from "@/app/utils/getUserDevices";
 
 export interface SideBarProps {
     onSelect: (option: string) => void;
@@ -28,7 +28,7 @@ export default function SideBar({ onSelect }: SideBarProps) {
 
     const handleGetDevices = async (userId: string) => {
         try {
-            const devices = await getDevices(userId);
+            const devices = await getUserDevices(userId);
             if (devices && devices.length > 0) {
                 setDevices(devices);
                 setSelectedOption(devices[0].device_id); // Set the first device as the default selected option
