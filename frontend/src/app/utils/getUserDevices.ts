@@ -12,7 +12,6 @@ export default async function getUserDevices(user_id: string) {
         }
 
         const data = await response.json();
-        console.log('Devices:', data.rows);
         return data.rows;
     } catch (error) {
         console.error('Failed to fetch devices:', error);

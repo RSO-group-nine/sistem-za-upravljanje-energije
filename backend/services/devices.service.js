@@ -6,6 +6,7 @@ const { Sequelize, DataTypes, where, json } = require("sequelize");
 const Registry = require('azure-iothub').Registry;
 const Client = require('azure-iothub').Client;
 const Message = require('azure-iot-device').Message;
+const { QueueClient } = require('@azure/storage-queue');
 
 const DeviceClient = require('azure-iot-device').Client;
 const Protocol = require('azure-iot-device-mqtt').Mqtt;
@@ -39,8 +40,9 @@ module.exports = {
 	},
 
 	settings: {
-		JWT_SECRET: process.env.JWT_SECRET || "jwt-placeholder-secret", // JWT secret key
-		// Validation rules for actions
+		JWT_SECRET: process.env.JWT_SECRET || "jwt-placeholder-secret",
+		Q_NAME: process.env.Q_NAME || "telemetry-q",
+		Q_CONNECTION_STRING: process.env.Q_CONNECTION_STRING || "DefaultEndpointsProtocol=https;AccountName=rsoproject;AccountKey=uUz7Gad/xjFUYox/n2V85N09s3KEvyi3e/ShIOM2IEYGTZgT2gX8mFrGYCnVjWsZkiRB0wUCrMgk+AStRu3jIA==;EndpointSuffix=core.windows.net",
 		entityValidator: {
 			user_email: { type: "email" },
 		}
@@ -88,104 +90,53 @@ module.exports = {
 			params: {
 				id: "number",
 			},
-		
 			async handler(ctx) {
 				const device_id = ctx.params.id;
 				this.logger.info(`Fetching device info for device with ID: ${device_id}`);
-		
-				try {
-					// Find device by ID
-					const device = await this.adapter.findById(device_id);
+				const device = await this.adapter.findById(device_id);
 					if (!device) {
 						throw new MoleculerClientError("Device not found", 404);
 					}
-		
-					const data = device.toJSON();
-					const connection_string = data.az_connection_string;
-					const deviceToReboot = data.az_device_id;
-					this.logger.info(`Using connection string: ${connection_string}`);
-		
-					// Initialize the DeviceClient and IoT Hub Client
-					const deviceClient = DeviceClient.fromConnectionString(connection_string, Protocol);
-					const serviceClient = Client.fromConnectionString(process.env.IOT_HUB_CONNECTION_STRING);
-					const methodParams = {
-						methodName: 'sendTelemetry',
-						payload: null,
-						timeoutInSeconds: 30,
-					};
-		
-					// Open device client with better error handling
-					// try {
-					// 	await deviceClient.open();
-					// 	this.logger.info('IoT Hub device client opened');
-		
-					// 	// Register the 'sendTelemetry' method
-					// 	deviceClient.onDeviceMethod('sendTelemetry', this.onSendTelemetry.bind(this));
-					// 	this.logger.info('Device method "sendTelemetry" registered successfully');
-					// } catch (err) {
-					// 	this.logger.error('Could not open or register device method on IoT Hub device client:', err.message);
-					// 	throw new MoleculerClientError('Failed to initialize device client', 500);
-					// }
-		
-					// Open service client and invoke method
-					try {
-						await serviceClient.open();
-						this.logger.info('IoT Hub service client opened');
-						
-						this.logger.info("Invoking method on device with ID:", deviceToReboot);
+				const data = device.toJSON();
+				const az_device_id = data.az_device_id;
+				const res = await this.readMessages(this.settings.Q_CONNECTION_STRING, this.settings.Q_NAME, az_device_id);
 
-						const result = await serviceClient.invokeDeviceMethod(deviceToReboot, methodParams);
-						
-						this.logger.info('Telemetry successfully sent', result);
-						return { deviceInfo: JSON.parse(result.payload) };
-					} catch (err) {
-						this.logger.error('Error invoking method:', err.message);
-						throw new MoleculerClientError('Failed to invoke method', 500);
-					} finally {
-						await serviceClient.close();
-						this.logger.info('IoT Hub service client closed');
-					}
-				} catch (err) {
-					this.logger.error('Handler error:', err.message);
-					throw err;
-				}
+				return JSON.parse(res);
+				
 			}
 		},
 	},
 		
 		methods: {
-			// Method to handle the device method call and send telemetry data
-			async onSendTelemetry(request, response) {
-				this.logger.info("Sending telemetry data...");
-		
-				// Generate random telemetry data
-				const telemetryData = this.generateRandomTelemetry();
-				this.logger.info("Generated telemetry data:", telemetryData);
-		
-				try {
-					// Send telemetry data to IoT Hub
-					await this.deviceClient.sendEvent(new Message(JSON.stringify(telemetryData)));
-					this.logger.info('Telemetry data sent successfully');
-		
-					// Send response back to IoT Hub
-					response.send(200, JSON.stringify(telemetryData));
-					this.logger.info('Response sent successfully');
-				} catch (err) {
-					this.logger.error('Error in onSendTelemetry method:', err.message);
-					response.send(500, { error: "Failed to send telemetry data" });
-				}
-			},
 
-		// Helper method to generate random telemetry values
-		generateRandomTelemetry() {
-			return {
-				temperature: (Math.random() * 15 + 15).toFixed(2), // Random temperature between 15-30°C
-				humidity: (Math.random() * 50 + 30).toFixed(2),    // Random humidity between 30-80%
-				pressure: (Math.random() * 50 + 950).toFixed(2),   // Random pressure between 950-1000 hPa
-				timestamp: new Date().toISOString(),               // Timestamp
-			};
+		async readMessages(connectionString, queueName, device_id) {
+			const queueClient = new QueueClient(connectionString, queueName);
+
+			console.log(`Reading messages from queue "${queueName}"...`);
+
+			// Retrieve one or more messages
+			const receivedMessages = await queueClient.receiveMessages({ numberOfMessages: 5 });
+			
+			if (receivedMessages.receivedMessageItems.length === 0) {
+				console.log("No messages found in the queue.");
+				return;
+			}
+			let msges = []
+			for (const message of receivedMessages.receivedMessageItems) {
+				// decode the message body from base64
+				const messageText = Buffer.from(message.messageText, "base64").toString();
+				const messageJson = JSON.parse(messageText);
+				const body = messageJson.data;
+
+				console.log(`Received message: ${JSON.stringify(body)}, ID: ${message.messageId}`);
+				const msg_device_id = body.systemProperties['iothub-connection-device-id'];
+				console.log(`Device ID: ${msg_device_id}`);
+				if (msg_device_id === device_id)
+					msges.push(body);
+			}
+			return JSON.stringify(msges);
 		},
-		
+
 		async seedDB() {
 			const existingDevice = await this.adapter.findOne({ where: { user_email: "rok.rajher8@gmail.com" } });
 			if (!existingDevice) {

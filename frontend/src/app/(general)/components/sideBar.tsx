@@ -58,7 +58,10 @@ export default function SideBar({ onSelect }: SideBarProps) {
                             className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
                                 device.device_id === selectedDevice?.device_id ? "bg-blue-400 text-white" : "hover:bg-blue-100"
                             }`}
-                            onClick={() => onSelect(device)}
+                            onClick={() => {
+                                onSelect(device);
+                                setSelectedDevice(device);
+                            }}
                         >
                             {device.device_id}
                         </li>

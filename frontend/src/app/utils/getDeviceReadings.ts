@@ -7,7 +7,6 @@ export interface Props {
 export default async function getDeviceReadings(device: Device) {
     const az_device_id = device.az_device_id;
     const id = device.device_id;
-    console.log('Device id:', id);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/devices/info`, {
             method: 'POST',
@@ -16,13 +15,12 @@ export default async function getDeviceReadings(device: Device) {
             },
             body: JSON.stringify({ id }),
         });
-        console.log('response:', response);
         if (!response.ok) {
             throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log('Device readings:', data);
+        console.log(`Device readings for device ${az_device_id}`, data);
         return data;
     } catch (error) {
         console.error('Failed to fetch device readings:', error);

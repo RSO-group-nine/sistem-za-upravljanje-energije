@@ -10,7 +10,6 @@ export default function Page() {
     // Update the selected device
     const handleDeviceSelect = (device: Device) => {
         setSelectedDevice(device);
-        console.log(device);
     };
 
     return (
@@ -19,7 +18,7 @@ export default function Page() {
             <SideBar onSelect={handleDeviceSelect} />
           </div>
             <main className="p-8 bg-white w-full">
-                {selectedDevice?.device_id == 1 && <DeviceComponent device={selectedDevice} />}
+                {selectedDevice && <DeviceComponent device={selectedDevice} />}
             </main>
         </div>
     );
