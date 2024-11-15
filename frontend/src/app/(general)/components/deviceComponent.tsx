@@ -23,9 +23,17 @@ export default function deviceComponent({ device }: DeviceComponentProps) {
         fetchData();
     }, [device.az_connection_string]);
 
+    function getDeviceIdFromCS(az_connection_string: string) {
+
+        const segments = az_connection_string.split(";");
+        const deviceIdSegment = segments.find(segment => segment.startsWith("DeviceId="));
+        const deviceId = deviceIdSegment?.split("=")[1];
+        return deviceId;
+    }
+
     return (
         <div className="container flex flex-col gap-4">
-            <h1 className="text-blue-500">{device.az_connection_string}</h1>
+            <h1 className="text-blue-500">{getDeviceIdFromCS(device.az_connection_string)}</h1>
             <ConsumptionGraph data={deviceData} />
             <GptPrompt />
         </div>
