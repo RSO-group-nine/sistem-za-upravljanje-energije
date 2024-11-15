@@ -16,7 +16,8 @@ const ProvisioningDeviceClient = require('azure-iot-provisioning-device').Provis
 
 // String containing Hostname, Device Id & Device Key in the following formats:
 //  'HostName=<iothub_host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>'
-let deviceConnectionString = "HostName=RSO-group-09.azure-devices.net;DeviceId=device2;SharedAccessKey=Xd52BG9H7VD69DMFulhC5bVX9+BbZsSKYu3abRCghYs=";
+// let deviceConnectionString = "HostName=RSO-group-09.azure-devices.net;DeviceId=device2;SharedAccessKey=Xd52BG9H7VD69DMFulhC5bVX9+BbZsSKYu3abRCghYs=";
+let deviceConnectionString = "HostName=RSO-group-09.azure-devices.net;DeviceId=device1;SharedAccessKey=AkFeFJhZXXzivYr5jAWaLKxwYyWOKVzdRV1lT89iD1U="
 
 // DPS connection information
 const provisioningHost = process.env.IOTHUB_DEVICE_DPS_ENDPOINT || 'global.azure-devices-provisioning.net';
