@@ -2,47 +2,28 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaSignOutAlt } from "react-icons/fa";
-import getUserDevices from "@/app/utils/getUserDevices";
 import Device from "@/app/entities/device";
 
 export interface SideBarProps {
-    onSelect: (device: Device) => void;
+   devices: Device[];
+   onSelect: (device: Device) => void;
 }
 
-export default function SideBar({ onSelect }: SideBarProps) {
+export default function SideBar({ devices, onSelect }: SideBarProps) {
     const router = useRouter();
     const [email, setEmail] = useState<string>("");
-    const [id, setId] = useState<string>("");
-    const [devices, setDevices] = useState<Device[]>([]);
-    const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+    const [selectedDevice, setSelectedDevice] = useState<Device | null>(devices[0] ?? null);
 
     const handleLogout = () => {
         sessionStorage.removeItem("email");
         sessionStorage.removeItem("id");
         router.push("/login");
     };
-
-    const handleGetDevices = async (userId: string) => {
-        try {
-            const devices = await getUserDevices(userId);
-            if (devices && devices.length > 0) {
-                setDevices(devices);
-                setSelectedDevice(devices[0]); // Set the first device as the default selected Device
-            }
-        } catch (error) {
-            console.error('Error fetching devices:', error);
-        }
-    };
-
+    
     useEffect(() => {
         const emailFromStorage = sessionStorage.getItem("email") ?? "";
-        const idFromStorage = sessionStorage.getItem("id") ?? "";
         setEmail(emailFromStorage);
-        setId(idFromStorage);
-        if (idFromStorage) {
-            handleGetDevices(idFromStorage);
-        }
-    }, []); // Empty dependency array to run this once when the component mounts
+    }, []);
 
     return (
         <aside className="bg-white text-gray-800 w-64 h-screen shadow-lg flex flex-col">
@@ -59,8 +40,8 @@ export default function SideBar({ onSelect }: SideBarProps) {
                                 device.device_id === selectedDevice?.device_id ? "bg-blue-400 text-white" : "hover:bg-blue-100"
                             }`}
                             onClick={() => {
-                                onSelect(device);
                                 setSelectedDevice(device);
+                                onSelect(device);
                             }}
                         >
                             {device.device_id}

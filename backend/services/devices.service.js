@@ -101,6 +101,9 @@ module.exports = {
 				const az_device_id = data.az_device_id;
 				const res = await this.readMessages(this.settings.Q_CONNECTION_STRING, this.settings.Q_NAME, az_device_id);
 
+				if (!res) {
+					throw new MoleculerClientError("No messages found", 404);
+				}
 				return JSON.parse(res);
 				
 			}

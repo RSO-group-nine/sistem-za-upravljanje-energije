@@ -21,10 +21,9 @@ export default function deviceComponent({ device }: DeviceComponentProps) {
         };
 
         fetchData();
-    }, [device.az_connection_string]);
+    }, [device.device_id]);
 
     function getDeviceIdFromCS(az_connection_string: string) {
-
         const segments = az_connection_string.split(";");
         const deviceIdSegment = segments.find(segment => segment.startsWith("DeviceId="));
         const deviceId = deviceIdSegment?.split("=")[1];
