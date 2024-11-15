@@ -11,7 +11,7 @@ async function readMessages() {
   console.log(`Reading messages from queue "${queueName}"...`);
 
   // Retrieve one or more messages
-  const receivedMessages = await queueClient.receiveMessages({ numberOfMessages: 5 });
+  const receivedMessages = await queueClient.receiveMessages({ numberOfMessages: 5, visibilityTimeout: 5 });
   
   if (receivedMessages.receivedMessageItems.length === 0) {
     console.log("No messages found in the queue.");
