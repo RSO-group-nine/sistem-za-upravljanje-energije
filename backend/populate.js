@@ -26,7 +26,7 @@ const symmetricKey = process.env.IOTHUB_DEVICE_DPS_DEVICE_KEY;
 const useDps = process.env.IOTHUB_DEVICE_SECURITY_TYPE || "connectionString";
 
 const modelIdObject = { modelId: 'dtmi:com:example:Thermostat;1' };
-const telemetrySendInterval = 10000;
+const telemetrySendInterval = 1000;
 const deviceSerialNum = '123abc';
 
 class TemperatureSensor {
