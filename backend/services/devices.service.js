@@ -118,13 +118,14 @@ module.exports = {
 			console.log(`Reading messages from queue "${queueName}"...`);
 
 			// Retrieve one or more messages
-			const receivedMessages = await queueClient.receiveMessages({ numberOfMessages: 8, visibilityTimeout: 5 });
+			const receivedMessages = await queueClient.receiveMessages({ numberOfMessages: 24, visibilityTimeout: 1 });
 			
 			if (receivedMessages.receivedMessageItems.length === 0) {
 				console.log("No messages found in the queue.");
 				return;
 			}
 			let msges = []
+			console.log(`Received messages: ${receivedMessages.receivedMessageItems.length}`);
 			for (const message of receivedMessages.receivedMessageItems) {
 				// decode the message body from base64
 				const messageText = Buffer.from(message.messageText, "base64").toString();
