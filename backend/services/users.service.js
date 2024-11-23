@@ -103,6 +103,13 @@ module.exports = {
 				
 			}
 		},
+		userLogout: {
+			rest: "POST /logout",
+			async handler(ctx) {
+				ctx.meta.$responseHeaders = {"Set-Cookie":`token=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=Strict`};
+				return {status: "success"};
+			}
+		},
 		/**
 		 * Get user by JWT token (for API GW authentication)
 		 *
