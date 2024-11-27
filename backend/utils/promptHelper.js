@@ -1,36 +1,37 @@
-// utils/promptHelper.ts
-const OpenAI = require("openai");
 const dotenv = require("dotenv");
 
 // Load environment variables
 dotenv.config();
-const apiKey = process.env.OPENAI_API_KEY;
-const org_ID = process.env.OPENAI_ORG_ID;
-const project_ID = process.env.OPENAI_PROJECT_ID;
-
-const openai = new OpenAI({
-    apiKey,
-    orgId: org_ID,
-    projectId: project_ID,
-});
+const apiKey = process.env.OPENROUTER_API_KEY;
 
 const generatePrompt = async (prompt) => {
-    try {
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "system", content: "You are a helpful assistant." },
-                { role: "user", content: prompt },
-            ],
-        });
+	try {
+		const response = await fetch(
+			"https://openrouter.ai/api/v1/chat/completions",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${apiKey}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					model: "nousresearch/hermes-3-llama-3.1-405b:free",
+					messages: [{ role: "user", content: prompt }],
+					top_p: 1,
+					temperature: 0.9,
+					repetition_penalty: 1,
+				}),
+			}
+		);
 
-        return completion.choices[0].message.content;
-    } catch (error) {
-        console.error("Error with OpenAI API:", error);
-        throw new Error("Failed to get response from OpenAI.");
-    }
+		const data = await response.json();
+		return data.choices[0].message.content;
+	} catch (error) {
+		console.error("Error with OpenRouter API:", error);
+		throw new Error("Failed to get response from OpenRouter.");
+	}
 };
 
 module.exports = {
-    generatePrompt,
+	generatePrompt,
 };
