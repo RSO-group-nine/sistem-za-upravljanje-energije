@@ -5,7 +5,7 @@ const helpers = require("../utils/promptHelper.js");
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
  * @typedef {import('moleculer').Context} Context Moleculer's Context
-*/
+ */
 
 /** @type {ServiceSchema} */
 module.exports = {
@@ -14,15 +14,12 @@ module.exports = {
 	/**
 	 * Settings
 	 */
-	settings: {
-
-	},
+	settings: {},
 
 	/**
 	 * Dependencies
 	 */
-	dependencies: [
-	],
+	dependencies: [],
 
 	/**
 	 * Actions
@@ -36,55 +33,52 @@ module.exports = {
 		prompt: {
 			rest: "POST /prompt",
 			params: {
-				prompt: "string"
+				prompt: "string",
 			},
+			timeout: 30000, // Timeout 30 seconds
 			/** @param {Context} ctx  */
 			async handler(ctx) {
 				try {
-					const promptResponse = await helpers.generatePrompt(ctx.params.prompt);
+					const promptResponse = await helpers.generatePrompt(
+						ctx.params.prompt
+					);
 
-					this.broker.logger.info(`The response to your question is, ${promptResponse}`);
+					this.broker.logger.info(
+						`The response to your question is, ${promptResponse}`
+					);
 					return `The response to your question is, ${promptResponse}`;
 				} catch (error) {
-					this.broker.logger.error("Failed to get response from OpenAI.");
+					this.broker.logger.error(
+						"Failed to get response from OpenAI."
+					);
 					return "Failed to get response from OpenAI.";
 				}
-			}
-		}
+			},
+		},
 	},
 
 	/**
 	 * Events
 	 */
-	events: {
-
-	},
+	events: {},
 
 	/**
 	 * Methods
 	 */
-	methods: {
-
-	},
+	methods: {},
 
 	/**
 	 * Service created lifecycle event handler
 	 */
-	created() {
-
-	},
+	created() {},
 
 	/**
 	 * Service started lifecycle event handler
 	 */
-	async started() {
-
-	},
+	async started() {},
 
 	/**
 	 * Service stopped lifecycle event handler
 	 */
-	async stopped() {
-
-	}
+	async stopped() {},
 };
