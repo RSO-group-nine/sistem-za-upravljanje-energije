@@ -23,14 +23,18 @@ module.exports = {
 		// Define the model for PostgreSQL using Sequelize DataTypes
 		name: "user",
 		define: {
-			id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+			id: {
+				type: DataTypes.INTEGER,
+				autoIncrement: true,
+				primaryKey: true,
+			},
 			email: { type: DataTypes.STRING, allowNull: false, unique: true },
-			password: { type: DataTypes.STRING, allowNull: false }
+			password: { type: DataTypes.STRING, allowNull: false },
 		},
 		options: {
 			// Additional options for Sequelize model
 			timestamps: true,
-		}
+		},
 	},
 
 	settings: {
@@ -38,8 +42,8 @@ module.exports = {
 		// Validation rules for actions
 		entityValidator: {
 			email: { type: "email" },
-			password: { type: "string", min: 6 }
-		}
+			password: { type: "string", min: 6 },
+		},
 	},
 
 	actions: {
@@ -48,67 +52,82 @@ module.exports = {
 			rest: "POST /register",
 			params: {
 				email: "email",
-				password: "string|min:6"
+				password: "string|min:6",
 			},
 			async handler(ctx) {
 				const user = ctx.params;
 				// Check if the email is already in use
-				const found = await this.adapter.findOne({ where: { email: user.email } });
-	
+				const found = await this.adapter.findOne({
+					where: { email: user.email },
+				});
+
 				if (found) {
-					throw new MoleculerClientError("Email already in use", 422, "", [{ field: "email", message: "is already in use" }]);
+					throw new MoleculerClientError(
+						"Email already in use",
+						422,
+						"",
+						[{ field: "email", message: "is already in use" }]
+					);
 				}
-	
+
 				// Hash the password before saving it to the database
 				user.password = await bcrypt.hash(user.password, 10);
-	
+
 				const doc = await this.adapter.insert(user);
 				const json = doc.toJSON();
-	
+
 				const entity = this.transformEntity(json, true, ctx.meta.token);
-	
+
 				return entity;
-			}
+			},
 		},
 
 		userLogin: {
 			rest: "POST /login",
 			params: {
 				email: "email",
-				password: "string"
+				password: "string",
 			},
 			async handler(ctx) {
-
 				const { email, password } = ctx.params;
 				const user = await this.adapter.findOne({ where: { email } });
 
 				if (!user) {
-					throw new MoleculerClientError("User not found", 404, "", [{ field: "email", message: "is not found" }]);
+					throw new MoleculerClientError("User not found", 404, "", [
+						{ field: "email", message: "is not found" },
+					]);
 				}
 
 				// Verify the password
 				const match = await bcrypt.compare(password, user.password);
 				if (!match) {
-					throw new MoleculerClientError("Invalid password", 401, "", [{ field: "password", message: "is incorrect" }]);
+					throw new MoleculerClientError(
+						"Invalid password",
+						401,
+						"",
+						[{ field: "password", message: "is incorrect" }]
+					);
 				}
-
 
 				// Transform and return user data with token
 				const json = user.toJSON();
 				const entity = this.transformEntity(json, true, ctx.meta.token);
 				const token = entity.user.token;
-				ctx.meta.$responseHeaders = {"Set-Cookie":`token=${token}; HttpOnly; Secure; Path=/; Max-Age=86400; SameSite=Strict`};
-				
+				ctx.meta.$responseHeaders = {
+					"Set-Cookie": `token=${token}; HttpOnly; Secure; Path=/; Max-Age=86400; SameSite=Strict`,
+				};
+
 				return entity;
-				
-			}
+			},
 		},
 		userLogout: {
 			rest: "POST /logout",
 			async handler(ctx) {
-				ctx.meta.$responseHeaders = {"Set-Cookie":`token=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=Strict`};
-				return {status: "success"};
-			}
+				ctx.meta.$responseHeaders = {
+					"Set-Cookie": `token=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=Strict`,
+				};
+				return { status: "success" };
+			},
 		},
 		/**
 		 * Get user by JWT token (for API GW authentication)
@@ -122,25 +141,27 @@ module.exports = {
 			rest: "POST /resolve",
 			cache: {
 				keys: ["token"],
-				ttl: 60 * 60 // 1 hour
+				ttl: 60 * 60, // 1 hour
 			},
 			params: {
-				token: "string"
+				token: "string",
 			},
 			async handler(ctx) {
 				this.logger.info("Resolving token:", ctx.params.token);
 				const decoded = await new this.Promise((resolve, reject) => {
-					jwt.verify(ctx.params.token, this.settings.JWT_SECRET, (err, decoded) => {
-						if (err)
-							return reject(err);
+					jwt.verify(
+						ctx.params.token,
+						this.settings.JWT_SECRET,
+						(err, decoded) => {
+							if (err) return reject(err);
 
-						resolve(decoded);
-					});
+							resolve(decoded);
+						}
+					);
 				});
 
-				if (decoded.id)
-					return this.getById(decoded.id);
-			}
+				if (decoded.id) return this.getById(decoded.id);
+			},
 		},
 	},
 	getUserById: {
@@ -161,57 +182,64 @@ module.exports = {
 		},
 	},
 	methods: {
-				/**
+		/**
 		 * Generate a JWT token from user entity
 		 *
 		 * @param {Object} user
 		 */
-				generateJWT(user) {
-					const today = new Date();
-					const exp = new Date(today);
-					exp.setDate(today.getDate() + 60);
-		
-					return jwt.sign({
-						id: user.id,
-						username: user.username,
-						exp: Math.floor(exp.getTime() / 1000)
-					}, this.settings.JWT_SECRET);
+		generateJWT(user) {
+			const today = new Date();
+			const exp = new Date(today);
+			exp.setDate(today.getDate() + 60);
+
+			return jwt.sign(
+				{
+					id: user.id,
+					username: user.username,
+					exp: Math.floor(exp.getTime() / 1000),
 				},
-		
-				/**
-				 * Transform returned user entity. Generate JWT token if neccessary.
-				 *
-				 * @param {Object} user
-				 * @param {Boolean} withToken
-				 */
-				transformEntity(user, withToken, token) {
-					if (user) {
-						if (withToken)
-							user.token = token || this.generateJWT(user);
-					}
-		
-					return { user };
-				},
+				this.settings.JWT_SECRET
+			);
+		},
+
+		/**
+		 * Transform returned user entity. Generate JWT token if neccessary.
+		 *
+		 * @param {Object} user
+		 * @param {Boolean} withToken
+		 */
+		transformEntity(user, withToken, token) {
+			if (user) {
+				if (withToken) user.token = token || this.generateJWT(user);
+			}
+
+			return { user };
+		},
 		/**
 		 * Seed the DB with initial users.
 		 */
 		async seedDB() {
 			await this.adapter.insertMany([
 				{ email: "john@example.com", password: "password123" },
-				{ email: "jane@example.com", password: "password456" }
+				{ email: "jane@example.com", password: "password456" },
 			]);
-		}
+		},
 	},
 
 	async started() {
 		// Call the started lifecycle method from DbService
 		if (this.seedDB) {
-				const count = await this.adapter.count();
-				if (count === 0) {
-					this.logger.info(`The users table is empty. Seeding the table...`);
-					await this.seedDB();
-					this.logger.info("Seeding is complete. Number of records:", await this.adapter.count());
-				}
+			const count = await this.adapter.count();
+			if (count === 0) {
+				this.logger.info(
+					`The users table is empty. Seeding the table...`
+				);
+				await this.seedDB();
+				this.logger.info(
+					"Seeding is complete. Number of records:",
+					await this.adapter.count()
+				);
 			}
-	}
+		}
+	},
 };
