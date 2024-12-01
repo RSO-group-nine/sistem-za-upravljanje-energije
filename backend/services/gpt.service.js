@@ -44,9 +44,9 @@ module.exports = {
 					);
 
 					this.broker.logger.info(
-						`The response to your question is, ${promptResponse}`
+						`The response to your question is: ${promptResponse}`
 					);
-					return `${promptResponse}`;
+					return `The response to your question is:\n${promptResponse}`;
 				} catch (error) {
 					this.broker.logger.error(
 						"Failed to get response from OpenAI."

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -15,13 +15,57 @@ const PromptSchema = Yup.object().shape({
     ),
 });
 
-export default function GptPrompt() {
+interface ConsumptionGraphProps {
+  data: {
+    properties: any;
+    systemProperties: {
+      "iothub-enqueuedtime": string;
+    };
+    body: {
+      temperature: number;
+    };
+    ID: string;
+  }[];
+}
+
+export default function GptPrompt({ data }: ConsumptionGraphProps) {
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
+
+  const [isCheckboxSelected, setIsCheckboxSelected] = useState(true);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsCheckboxSelected(event.target.checked);
+  };
+
+  const formatConsumptionData = (
+    data: ConsumptionGraphProps["data"]
+  ): string => {
+    return data
+      .map((item) => {
+        const date = item.systemProperties["iothub-enqueuedtime"];
+        const temperature = item.body.temperature;
+        return `${date}: ${temperature} °C`;
+      })
+      .join(", ");
+  };
 
   const handlePrompt = async (values: { prompt: string }): Promise<void> => {
     try {
       setError("");
+
+      let promptInput = "";
+      if (data && isCheckboxSelected) {
+        promptInput =
+          values.prompt +
+          "\n" +
+          "Question is based for next temperature data in format [date, temperature °C]: " +
+          formatConsumptionData(data);
+      } else {
+        promptInput = values.prompt;
+      }
+
+      console.log("Prompt input:", promptInput);
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_PATH}/gpt/prompt`,
@@ -30,7 +74,7 @@ export default function GptPrompt() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ prompt: values.prompt }),
+          body: JSON.stringify({ prompt: promptInput }),
         }
       );
 
@@ -41,8 +85,8 @@ export default function GptPrompt() {
         return;
       }
 
-      const data = await res.json();
-      setResponse(data);
+      const reponse = await res.json();
+      setResponse(reponse);
     } catch (err) {
       console.error("Error:", err);
       setError("An unexpected error occurred. Please try again.");
@@ -51,14 +95,16 @@ export default function GptPrompt() {
 
   return (
     <main>
-      <h2 className="text-2xl font-bold mb-6 text-blue-500">GPT Prompt</h2>
+      <h2 className="text-2xl font-bold mb-6 text-blue-500">
+        Ask GPT about your tempetaure consumption tips
+      </h2>
       <Formik
         initialValues={{ prompt: "" }}
         validationSchema={PromptSchema}
         onSubmit={handlePrompt}
       >
         {({ isSubmitting }) => (
-          <Form className="space-y-6 text-gray-700">
+          <Form className="space-y-4 text-gray-700">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-600">
                 Prompt
@@ -75,6 +121,23 @@ export default function GptPrompt() {
                 className="text-red-500 text-sm pt-1"
               />
             </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                className="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                name="includeTemperature"
+                id="includeTemperature"
+                value="checkedValue"
+                defaultChecked={isCheckboxSelected}
+                onChange={handleCheckboxChange}
+              />
+              <label
+                htmlFor="includeTemperature"
+                className="ml-2 text-gray-700"
+              >
+                Include temperature data in GPT prompt
+              </label>
+            </div>
             <button
               type="submit"
               disabled={isSubmitting}
@@ -90,7 +153,7 @@ export default function GptPrompt() {
               </label>
               <textarea
                 value={response}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 h-32"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 h-64"
                 placeholder="Response"
                 readOnly
               />

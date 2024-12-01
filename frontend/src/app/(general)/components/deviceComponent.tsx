@@ -26,7 +26,7 @@ export default function DeviceComponent({
         {getDeviceIdFromCS(device.az_connection_string)}
       </h1>
       {deviceDataG && <ConsumptionGraph data={deviceDataG} />}
-      <GptPrompt />
+      {deviceDataG && <GptPrompt data={deviceDataG} />}
     </div>
   );
 }
