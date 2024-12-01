@@ -23,7 +23,9 @@ export default function DeviceComponent({
   return (
     <div className="container flex flex-col gap-4">
       <h1 className="text-blue-500">
-        {getDeviceIdFromCS(device.az_connection_string)}
+        {device.az_connection_string
+          ? getDeviceIdFromCS(device.az_connection_string)
+          : "All"}
       </h1>
       {deviceDataG && <ConsumptionGraph data={deviceDataG} />}
       {deviceDataG && <GptPrompt data={deviceDataG} />}

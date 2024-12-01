@@ -20,6 +20,7 @@ interface ConsumptionGraphProps {
     properties: any;
     systemProperties: {
       "iothub-enqueuedtime": string;
+      "iothub-connection-device-id": string;
     };
     body: {
       temperature: number;
@@ -45,7 +46,8 @@ export default function GptPrompt({ data }: ConsumptionGraphProps) {
       .map((item) => {
         const date = item.systemProperties["iothub-enqueuedtime"];
         const temperature = item.body.temperature;
-        return `${date}: ${temperature} °C`;
+        const device = item.systemProperties["iothub-connection-device-id"];
+        return `${device} : ${date} : ${temperature} °C`;
       })
       .join(", ");
   };
@@ -59,7 +61,7 @@ export default function GptPrompt({ data }: ConsumptionGraphProps) {
         promptInput =
           values.prompt +
           "\n" +
-          "Question is based for next temperature data in format [date, temperature °C]: " +
+          "Question is based for next temperature data in format [device : date : temperature °C, ...]: " +
           formatConsumptionData(data);
       } else {
         promptInput = values.prompt;
