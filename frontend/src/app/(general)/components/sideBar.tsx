@@ -9,7 +9,7 @@ import getDeviceReadings from "@/app/utils/getDeviceReadings";
 export interface SideBarProps {
   devices: Device[];
   device: Device;
-  onSelect: (device: Device) => void;
+  onSelect: (device: Device | "All") => void;
   onData: (data: any) => void;
 }
 
@@ -22,7 +22,8 @@ export default function SideBar({
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [fetchId, setFetchId] = useState(-1);
-  const [selectedDevice, setSelectedDevice] = useState<Device | null>(
+  const [loading, setLoading] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState<Device | "All" | null>(
     devices[0] ?? null
   );
 
@@ -33,6 +34,29 @@ export default function SideBar({
     } catch (error) {
       console.error("Error fetching device data:", error);
     }
+  }
+
+  async function fetchAllDevicesData() {
+    try {
+      console.log("Fetching devices...");
+      const data = [];
+
+      for (const device of devices) {
+        await delay(1000); // Delay of 1 second between each call
+        const deviceData = await getDeviceReadings(device);
+        data.push(deviceData);
+      }
+      const flattenedData = data.flat();
+
+      setDeviceData(flattenedData);
+    } catch (error) {
+      console.error("Error fetching device data:", error);
+    }
+  }
+
+  // Function to add a delay
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   const setDeviceData = (data: any) => {
@@ -62,10 +86,15 @@ export default function SideBar({
   useEffect(() => {
     const fetchData = async () => {
       console.log(device);
-      if (device.device_id !== null && fetchId !== device.device_id) {
+      setLoading(true);
+      if (device === "All" && devices.length > 0) {
+        await fetchAllDevicesData();
+        setFetchId(-1);
+      } else if (device.device_id !== null && fetchId !== device.device_id) {
         setFetchId(device.device_id);
         await fetchTheData();
       }
+      setLoading(false);
     };
 
     fetchData();
@@ -80,31 +109,48 @@ export default function SideBar({
         <h1 className="text-3xl font-bold text-blue-500 p-6 border-b border-gray-200">
           Devices
         </h1>
-        <ul className="flex flex-col mt-4">
-          {devices.map((device) => (
+        {loading ? (
+          <div className="p-4 text-center text-blue-500">Fetching data...</div>
+        ) : (
+          <ul className="flex flex-col mt-4">
             <li
-              key={device.device_id}
+              key="all"
               className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
-                device.device_id === selectedDevice?.device_id
+                selectedDevice === "All"
                   ? "bg-blue-400 text-white"
                   : "hover:bg-blue-100"
               }`}
               onClick={() => {
-                setSelectedDevice(device);
-                onSelect(device);
+                setSelectedDevice("All");
+                onSelect("All");
               }}
             >
-              {device.device_id}
+              All
             </li>
-          ))}
-        </ul>
+            {devices.map((device) => (
+              <li
+                key={device.device_id}
+                className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
+                  device.device_id === selectedDevice?.device_id
+                    ? "bg-blue-400 text-white"
+                    : "hover:bg-blue-100"
+                }`}
+                onClick={() => {
+                  setSelectedDevice(device);
+                  onSelect(device);
+                }}
+              >
+                {device.device_id}
+              </li>
+            ))}
+          </ul>
+        )}
       </nav>
       <button
         onClick={handleLogout}
         className="bg-blue-500 text-white p-4 w-full flex items-center justify-center hover:bg-blue-600 transition-colors duration-200 ease-in-out"
       >
-        <FaSignOutAlt className="mr-2" />
-        Log Out
+        Logout
       </button>
     </aside>
   );

@@ -19,7 +19,9 @@ export default async function getDeviceReadings(device: Device) {
             throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const data = await response.json(); 
+        data.sort((a, b) => new Date(a.systemProperties["iothub-enqueuedtime"]).getTime() - new Date(b.systemProperties["iothub-enqueuedtime"]).getTime());
+
         console.log(`Device readings for device ${az_device_id}`, data);
         return data;
     } catch (error) {
