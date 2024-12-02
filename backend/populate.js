@@ -38,18 +38,30 @@ const deviceSerialNum = "123abc";
 class TemperatureSensor {
 	constructor() {
 		console.log("Temperature sensor created");
-		this.currTemp = 1 + Math.random() * 90;
+		this.currTemp = Math.floor(Math.random() * 41);
 		this.maxTemp = this.currTemp;
 		this.minTemp = this.currTemp;
 		this.cumulativeTemperature = this.currTemp;
-		this.startTime = new Date(Date.now()).toISOString();
+		this.startTime = new Date("2024-12-02T15:20:00Z");
 		this.numberOfTemperatureReadings = 1;
 	}
+
 	getCurrentTemperatureObject() {
-		return { temperature: this.currTemp };
+		const temperatureObject = {
+			temperature: this.currTemp,
+			date: this.startTime,
+		};
+		this.incrementTime();
+		return temperatureObject;
 	}
+
+	incrementTime() {
+		// Increment the time by 10 minutes
+		this.startTime.setMinutes(this.startTime.getMinutes() + 10);
+	}
+
 	updateSensor() {
-		this.currTemp = 1 + Math.random() * 90;
+		this.currTemp = Math.floor(Math.random() * 41);
 		this.cumulativeTemperature += this.currTemp;
 		this.numberOfTemperatureReadings++;
 		if (this.currTemp > this.maxTemp) {
@@ -66,7 +78,7 @@ class TemperatureSensor {
 			minTemp: this.minTemp,
 			avgTemp:
 				this.cumulativeTemperature / this.numberOfTemperatureReadings,
-			endTime: new Date(Date.now()).toISOString(),
+			endTime: "2024-12-02T17:50:00Z",
 			startTime: this.startTime,
 		};
 	}
