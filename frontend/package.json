@@ -11,7 +11,9 @@
   "dependencies": {
     "@types/js-cookie": "^3.0.6",
     "chart.js": "^4.4.6",
+    "cross-spawn": "^7.0.6",
     "dotenv": "^16.4.5",
+    "es5-ext": "^0.10.64",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "next": "^15.0.2",

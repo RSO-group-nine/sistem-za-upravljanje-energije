@@ -38,6 +38,7 @@
     "azure-iot-security-symmetric-key": "^1.8.2",
     "azure-iothub": "^1.16.5",
     "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.2",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "moleculer": "^0.14.26",
