@@ -49,9 +49,9 @@ module.exports = {
 					return `The response to your question is:\n${promptResponse}`;
 				} catch (error) {
 					this.broker.logger.error(
-						"Failed to get response from OpenAI."
+						"Failed to get a response from the Generative AI model."
 					);
-					return "Failed to get response from OpenAI.";
+					return "Failed to get a response from the Generative AI model.";
 				}
 			},
 		},

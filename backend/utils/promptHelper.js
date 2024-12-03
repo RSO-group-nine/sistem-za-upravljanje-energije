@@ -1,34 +1,22 @@
 const dotenv = require("dotenv");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Load environment variables
 dotenv.config();
-const apiKey = process.env.OPENROUTER_API_KEY;
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const generatePrompt = async (prompt) => {
 	try {
-		const response = await fetch(
-			"https://openrouter.ai/api/v1/chat/completions",
-			{
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${apiKey}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					model: "nousresearch/hermes-3-llama-3.1-405b:free",
-					messages: [{ role: "user", content: prompt }],
-					top_p: 1,
-					temperature: 0.9,
-					repetition_penalty: 1,
-				}),
-			}
-		);
-
-		const data = await response.json();
-		return data.choices[0].message.content;
+		const result = await model.generateContent(prompt);
+		const response = await result.response;
+		const text = await response.text();
+		return text;
 	} catch (error) {
-		console.error("Error with OpenRouter API:", error);
-		throw new Error("Failed to get response from OpenRouter.");
+		console.error("Error generating response:", error);
+		throw new Error(
+			"Failed to get a response from the Generative AI model."
+		);
 	}
 };
 
