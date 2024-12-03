@@ -28,19 +28,17 @@ module.exports = {
 
 		routes: [
 			{
-				path: `/api/${process.env.API_VERSION || 'v1'}`,
+				path: `/api/${process.env.API_VERSION || "v1"}`,
 
-				whitelist: [
-					"**"
-				],
+				whitelist: ["**"],
 				cors: {
 					origin: ["http://localhost:3000"], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
 					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
 					exposedHeaders: [],
 					credentials: true,
-					maxAge: 3600
-				  },
+					maxAge: 3600,
+				},
 
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
@@ -58,9 +56,7 @@ module.exports = {
 				// The gateway will dynamically build the full routes from service schema.
 				autoAliases: true,
 
-				aliases: {
-
-				},
+				aliases: {},
 
 				/**
 				 * Before call hook. You can check the request.
@@ -93,20 +89,28 @@ module.exports = {
 				bodyParsers: {
 					json: {
 						strict: false,
-						limit: "1MB"
+						limit: "1MB",
 					},
 					urlencoded: {
 						extended: true,
-						limit: "1MB"
-					}
+						limit: "1MB",
+					},
 				},
 
 				// Mapping policy setting. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Mapping-policy
 				mappingPolicy: "all", // Available values: "all", "restrict"
 
 				// Enable/disable logging
-				logging: true
-			}
+				logging: true,
+			},
+			{
+				path: "/api/openapi",
+				aliases: {
+					"GET /openapi.json": "openapi.generateDocs", // swagger scheme
+					"GET /ui": "openapi.ui", // ui
+					"GET /assets/:file": "openapi.assets", // js/css files
+				},
+			},
 		],
 
 		// Do not log client side errors (does not log an error response when the error.code is 400<=X<500)
@@ -116,14 +120,13 @@ module.exports = {
 		// Logging the response data. Set to any log level to enable it. E.g. "info"
 		logResponseData: null,
 
-
 		// Serve assets from "public" folder. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Serve-static-files
 		assets: {
 			folder: "public",
 
 			// Options to `server-static` module
-			options: {}
-		}
+			options: {},
+		},
 	},
 
 	methods: {
@@ -151,9 +154,16 @@ module.exports = {
 				try {
 					user = await ctx.call("users.resolveToken", { token });
 					if (user) {
-						this.logger.info("Authenticated via JWT: ", user.username);
+						this.logger.info(
+							"Authenticated via JWT: ",
+							user.username
+						);
 						// Reduce user fields (it will be transferred to other nodes)
-						ctx.meta.user = _.pick(user, ["id", "username", "email"]);
+						ctx.meta.user = _.pick(user, [
+							"id",
+							"username",
+							"email",
+						]);
 						ctx.meta.token = token;
 						ctx.meta.userID = user._id;
 					}
@@ -164,7 +174,6 @@ module.exports = {
 
 			if (req.$action.auth == "required" && !user)
 				throw new UnAuthorizedError();
-		}
-
-	}
+		},
+	},
 };
