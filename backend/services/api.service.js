@@ -32,7 +32,7 @@ module.exports = {
 
 				whitelist: ["**"],
 				cors: {
-					origin: ["http://localhost:3000"], // Allow all origins for testing purposes
+					origin: ["http://localhost:3000", "http://localhost:5000"], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
 					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
 					exposedHeaders: [],
