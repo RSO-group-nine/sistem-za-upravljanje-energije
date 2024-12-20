@@ -40,7 +40,7 @@ export default function Page() {
   }, []); // Empty dependency array to run this once when the component mounts
 
   return (
-    <div className="flex">
+    <div className="flex h-full">
       <div className="">
         {selectedDevice && (
           <SideBar
