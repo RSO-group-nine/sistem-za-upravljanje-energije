@@ -11,7 +11,8 @@
     "lint": "eslint services",
     "dc:up": "docker-compose up --build -d",
     "dc:logs": "docker-compose logs -f",
-    "dc:down": "docker-compose down"
+    "dc:down": "docker-compose down",
+    "dc:push": "docker push zigac24/sistem-za-upravljanje-energije:molecular_v1"
   },
   "keywords": [
     "microservices",
@@ -25,6 +26,11 @@
     "moleculer-repl": "^0.7.3"
   },
   "dependencies": {
+    "formik": "^2.4.6",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "recharts": "^2.13.3",
+    "yup": "^1.4.0",
     "@azure/arm-iothub": "^6.3.0",
     "@azure/event-hubs": "^5.12.2",
     "@azure/identity": "^4.5.0",

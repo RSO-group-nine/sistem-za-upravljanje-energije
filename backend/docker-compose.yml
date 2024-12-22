@@ -1,15 +1,11 @@
-version: "3.3"
-
 services:
-
   api:
     build:
       context: .
-    image: backend
-    env_file: docker-compose.env
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
     environment:
-      SERVICES: api
-      PORT: 3000
+      SERVICES: api # Moleculer Runner will start only the 'api' service in this container
     depends_on:
       - nats
     labels:
@@ -19,13 +15,61 @@ services:
     networks:
       - internal
 
+  device:
+    build:
+      context: .
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
+    environment:
+      SERVICES: device
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+  gpt:
+    build:
+      context: .
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
+    environment:
+      SERVICES: gpt
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+  openapi:
+    build:
+      context: .
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
+    environment:
+      SERVICES: openapi
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+  users:
+    build:
+      context: .
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
+    environment:
+      SERVICES: users
+    depends_on:
+      - nats
+    networks:
+      - internal
+
   greeter:
     build:
       context: .
-    image: backend
-    env_file: docker-compose.env
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
     environment:
-      SERVICES: greeter
+      SERVICES: greeter # Moleculer Runner will start only the 'greeter' service in this container
     depends_on:
       - nats
     networks:
@@ -34,20 +78,12 @@ services:
   products:
     build:
       context: .
-    image: backend
-    env_file: docker-compose.env
+    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    env_file: .env
     environment:
-      SERVICES: products
+      SERVICES: products # Moleculer Runner will start only the 'products' service in this container
     depends_on:
-      - mongo
       - nats
-    networks:
-      - internal
-
-  mongo:
-    image: mongo:4
-    volumes:
-      - data:/data/db
     networks:
       - internal
 
@@ -57,7 +93,7 @@ services:
       - internal
 
   traefik:
-    image: traefik:v2.4
+    image: traefik:v2.1
     command:
       - "--api.insecure=true" # Don't do that in production!
       - "--providers.docker=true"
@@ -73,6 +109,4 @@ services:
 
 networks:
   internal:
-
-volumes:
-  data:
+    driver: bridge

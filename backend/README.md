@@ -15,7 +15,6 @@ In the terminal, try the following commands:
 - `call greeter.welcome --name John` - Call the `greeter.welcome` action with the `name` parameter.
 - `call products.list` - List the products (call the `products.list` action).
 
-
 ## Services
 - **api**: API Gateway services
 - **greeter**: Sample service with `hello` and `welcome` actions.
@@ -23,7 +22,6 @@ In the terminal, try the following commands:
 
 ## Mixins
 - **db.mixin**: Database access mixin for services. Based on [moleculer-db](https://github.com/moleculerjs/moleculer-db#readme)
-
 
 ## Useful links
 
@@ -40,3 +38,14 @@ In the terminal, try the following commands:
 - `npm test`: Run tests & generate coverage report
 - `npm run dc:up`: Start the stack with Docker Compose
 - `npm run dc:down`: Stop the stack with Docker Compose
+
+## Docker
+
+Run npm run "script_name"
+
+```bash
+"dc:up": "docker-compose up --build -d",
+"dc:down": "docker-compose down",
+"dc:logs": "docker-compose logs -f",
+"dc:push": "docker push zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1"
+```
