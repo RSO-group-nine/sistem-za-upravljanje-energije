@@ -97,7 +97,7 @@ services:
   api:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
@@ -116,7 +116,7 @@ services:
   device:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
@@ -131,7 +131,7 @@ services:
   gpt:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
@@ -146,7 +146,7 @@ services:
   openapi:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
@@ -160,7 +160,7 @@ services:
   users:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
@@ -175,7 +175,7 @@ services:
   products:
     build:
       context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
+    image: zigac24/sistem-za-upravljanje-energije:molecular_v1
     env_file:
       - docker-compose.env
       - .env
