@@ -45,8 +45,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: molecular-configmap
-            - secrectRef:
-                name: molecular-secrects
+            - secretRef:
+                name: molecular-secrets
           ports:
             - name: http
               protocol: TCP
