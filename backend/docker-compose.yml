@@ -1,13 +1,111 @@
 services:
+  nats:
+    image: nats:2
+    ports:
+      - "4222:4222"
+    restart: unless-stopped
+    command:
+      - "-m"
+      - "8222"
+    networks:
+      - internal
+
+  nats_exporter:
+    image: natsio/prometheus-nats-exporter:latest
+    command:
+      - "-varz"
+      - http://nats:8222
+
+  redis:
+    image: redis:6-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+
+  redis_exporter:
+    image: oliver006/redis_exporter:alpine
+    environment:
+      REDIS_ADDR: redis://redis:6379
+
+  traefik:
+    image: traefik:2.4
+    command:
+      - "--api.insecure=true"
+      - "--entryPoints.http.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--metrics.prometheus=true"
+      - "--entryPoints.metrics.address=:8082"
+      - "--metrics.prometheus.entryPoint=metrics"
+    ports:
+      - "3000:80"
+      - "3001:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    networks:
+      - internal
+
+  prometheus:
+    image: prom/prometheus:v2.25.0
+    volumes:
+      - ./monitoring/prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - "9090:9090"
+    links:
+      - alertmanager:alertmanager
+    restart: unless-stopped
+    networks:
+      - internal
+
+  alertmanager:
+    image: prom/alertmanager:v0.15.3
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/:/etc/alertmanager/
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
+    networks:
+      - internal
+
+  grafana:
+    image: grafana/grafana:6.5.0
+    depends_on:
+      - prometheus
+    ports:
+      - "9000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./monitoring/grafana/plugins/:/var/lib/grafana/plugins/
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    networks:
+      - internal
+
   api:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: api # Moleculer Runner will start only the 'api' service in this container
     depends_on:
       - nats
+      - redis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api-gw.rule=PathPrefix(`/`)"
@@ -19,11 +117,14 @@ services:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: device
     depends_on:
       - nats
+      - redis
     networks:
       - internal
 
@@ -31,11 +132,14 @@ services:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: gpt
     depends_on:
       - nats
+      - redis
     networks:
       - internal
 
@@ -43,7 +147,9 @@ services:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: openapi
     depends_on:
@@ -55,23 +161,14 @@ services:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: users
     depends_on:
       - nats
-    networks:
-      - internal
-
-  greeter:
-    build:
-      context: .
-    image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
-    environment:
-      SERVICES: greeter # Moleculer Runner will start only the 'greeter' service in this container
-    depends_on:
-      - nats
+      - redis
     networks:
       - internal
 
@@ -79,33 +176,24 @@ services:
     build:
       context: .
     image: zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1
-    env_file: .env
+    env_file:
+      - docker-compose.env
+      - .env
     environment:
       SERVICES: products # Moleculer Runner will start only the 'products' service in this container
     depends_on:
       - nats
+      - redis
     networks:
       - internal
 
-  nats:
-    image: nats:2
-    networks:
-      - internal
-
-  traefik:
-    image: traefik:v2.1
-    command:
-      - "--api.insecure=true" # Don't do that in production!
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-    ports:
-      - 3000:80
-      - 3001:8080
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - internal
-      - default
+volumes:
+  app_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
 
 networks:
   internal:
