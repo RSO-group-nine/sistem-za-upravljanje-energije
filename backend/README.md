@@ -47,5 +47,23 @@ Run npm run "script_name"
 "dc:up": "docker-compose up --build -d",
 "dc:down": "docker-compose down",
 "dc:logs": "docker-compose logs -f",
-"dc:push": "docker push zigac24/sistem-za-upravljanje-energije-molecular:molecular_v1"
+"dc:push": "docker push zigac24/sistem-za-upravljanje-energije:molecular_v1"
+```
+
+Deploy to Kubernetes
+
+```bash
+doctl kubernetes cluster kubeconfig save f76b29fc-6412-4385-8b85-4377575ae4f5
+
+kubectl create configmap molecular-configmap --from-env-file=./.env --namespace=default
+
+kubectl create secret generic molecular-secrets --from-env-file=./.secret --namespace=default    
+
+kubectl apply -f .                                                                           
+
+kubectl get pods                                                                             
+
+kubectl logs <pod_name>                                      
+
+kubectl get services
 ```
