@@ -1,6 +1,6 @@
 # Dockerfile
-# preferred node version chosen here (LTS = 18.18 as of 10/10/23)
-FROM node:18.18-alpine
+# preferred node version chosen
+FROM node:18-alpine
 
 # Create the directory on the node image
 # where our Next.js app will live
@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8080
 
 # Run dev, as we would via the command line
-CMD ["npm", "dev"]
+CMD npm run dev
