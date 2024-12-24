@@ -1,0 +1,39 @@
+#########################################################
+# users service
+#########################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+  namespace: default
+  labels:
+    name: users-deployment
+    app: sistem-za-upravljanje-energije
+spec:
+  selector:
+    matchLabels:
+      app: users
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: zigac24/sistem-za-upravljanje-energije:molecular_v1
+          envFrom:
+            - configMapRef:
+                name: molecular-configmap
+            - secretRef:
+                name: molecular-secrets
+          env:
+            - name: SERVICES
+              value: users
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 40Mi

@@ -1,0 +1,60 @@
+# my global config
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'moleculer'
+
+# Load and evaluate rules in this file every 'evaluation_interval' seconds.
+rule_files:
+  - 'alert.rules'
+
+# alert
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "alertmanager:9093"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
+  # Prometheus internal exporter
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # NATS
+  - job_name: 'nats'
+    static_configs:
+    - targets: ['nats_exporter:7777']
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+    - targets: ['redis_exporter:9121']
+
+  # Mongo
+  - job_name: 'mongo'
+    static_configs:
+    - targets: ['mongo_exporter:9216']
+
+  # Traefik
+  - job_name: 'traefik'
+    static_configs:
+    - targets: ['traefik:8082']
+
+  # Moleculer exporter
+  - job_name: 'moleculer'
+    file_sd_configs:
+      - files:
+          - "/etc/prometheus/targets.json"
+        refresh_interval: 5s

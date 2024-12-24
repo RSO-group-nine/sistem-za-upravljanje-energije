@@ -26,11 +26,6 @@
     "moleculer-repl": "^0.7.3"
   },
   "dependencies": {
-    "formik": "^2.4.6",
-    "pg": "^8.13.1",
-    "pg-hstore": "^2.3.4",
-    "recharts": "^2.13.3",
-    "yup": "^1.4.0",
     "@azure/arm-iothub": "^6.3.0",
     "@azure/event-hubs": "^5.12.2",
     "@azure/identity": "^4.5.0",
@@ -46,6 +41,8 @@
     "bcryptjs": "^2.4.3",
     "cookie": "^1.0.2",
     "dotenv": "^16.4.5",
+    "formik": "^2.4.6",
+    "ioredis": "^5.4.2",
     "jsonwebtoken": "^9.0.2",
     "moleculer": "^0.14.26",
     "moleculer-auto-openapi": "^1.1.6",
@@ -54,7 +51,11 @@
     "moleculer-db-adapter-sequelize": "^0.2.18",
     "moleculer-web": "^0.10.7",
     "nats": "^2.7.1",
-    "openai": "^4.71.1"
+    "openai": "^4.71.1",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "recharts": "^2.13.3",
+    "yup": "^1.4.0"
   },
   "engines": {
     "node": ">= 16.x.x"
