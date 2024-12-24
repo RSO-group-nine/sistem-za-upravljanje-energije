@@ -55,6 +55,8 @@ Deploy to Kubernetes
 ```bash
 doctl kubernetes cluster kubeconfig save f76b29fc-6412-4385-8b85-4377575ae4f5
 
+cd manifests
+
 kubectl create configmap molecular-configmap --from-env-file=./.env --namespace=default
 
 kubectl create secret generic molecular-secrets --from-env-file=./.secret --namespace=default    
