@@ -16,7 +16,5 @@ COPY . .
 # Expose port 8080 to the host
 EXPOSE 8080
 
-# Start the application in development mode
-CMD ["npm", "run", "dev"]
-
-##
+# Start the application
+CMD ["npm", "run", "build"]
