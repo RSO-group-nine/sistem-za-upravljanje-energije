@@ -2,6 +2,8 @@
 
 require("dotenv").config();
 const ApiGateway = require("moleculer-web");
+const { UnAuthorizedError } = require("moleculer-web").Errors;
+const _ = require("lodash");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
