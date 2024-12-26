@@ -22,6 +22,7 @@ spec:
       containers:
         - name: users
           image: zigac24/sistem-za-upravljanje-energije:molecular_v1
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: molecular-configmap
