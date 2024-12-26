@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -17,12 +17,12 @@ const PromptSchema = Yup.object().shape({
 
 interface ConsumptionGraphProps {
   data: {
-    properties: any;
     systemProperties: {
       "iothub-enqueuedtime": string;
       "iothub-connection-device-id": string;
     };
     body: {
+      date: string;
       temperature: number;
     };
     ID: string;

@@ -20,7 +20,7 @@ export default async function getDeviceReadings(device: Device) {
         }
 
         const data = await response.json(); 
-        data.sort((a, b) => new Date(a.systemProperties["iothub-enqueuedtime"]).getTime() - new Date(b.systemProperties["iothub-enqueuedtime"]).getTime());
+        data.sort((a: { systemProperties: { [x: string]: string | number | Date; }; }, b: { systemProperties: { [x: string]: string | number | Date; }; }) => new Date(a.systemProperties["iothub-enqueuedtime"]).getTime() - new Date(b.systemProperties["iothub-enqueuedtime"]).getTime());
 
         console.log(`Device readings for device ${az_device_id}`, data);
         return data;

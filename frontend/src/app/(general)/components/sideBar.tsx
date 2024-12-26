@@ -1,16 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FaSignOutAlt } from "react-icons/fa";
 import Device from "@/app/entities/device";
 import userLogout from "@/app/utils/userLogout";
 import getDeviceReadings from "@/app/utils/getDeviceReadings";
 
 export interface SideBarProps {
   devices: Device[];
-  device: Device;
+  device: Device | "All";
   onSelect: (device: Device | "All") => void;
-  onData: (data: any) => void;
+  onData: (
+    data: {
+      body: {
+        date: string;
+        temperature: number;
+      };
+      systemProperties: {
+        "iothub-enqueuedtime": string;
+        "iothub-connection-device-id": string;
+      };
+      ID: string;
+    }[]
+  ) => void;
 }
 
 export default function SideBar({
@@ -29,6 +40,9 @@ export default function SideBar({
 
   async function fetchTheData() {
     try {
+      if (device === "All") {
+        return;
+      }
       const data = await getDeviceReadings(device);
       setDeviceData(data);
     } catch (error) {
@@ -55,11 +69,23 @@ export default function SideBar({
   }
 
   // Function to add a delay
-  function delay(ms) {
+  function delay(ms: number | undefined) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  const setDeviceData = (data: any) => {
+  const setDeviceData = (
+    data: {
+      body: {
+        date: string;
+        temperature: number;
+      };
+      systemProperties: {
+        "iothub-enqueuedtime": string;
+        "iothub-connection-device-id": string;
+      };
+      ID: string;
+    }[]
+  ) => {
     onData(data);
   };
 
@@ -90,7 +116,11 @@ export default function SideBar({
       if (device === "All" && devices.length > 0) {
         await fetchAllDevicesData();
         setFetchId(-1);
-      } else if (device.device_id !== null && fetchId !== device.device_id) {
+      } else if (
+        device !== "All" &&
+        device.device_id !== null &&
+        fetchId !== device.device_id
+      ) {
         setFetchId(device.device_id);
         await fetchTheData();
       }
@@ -131,6 +161,7 @@ export default function SideBar({
               <li
                 key={device.device_id}
                 className={`cursor-pointer p-4 w-full rounded-lg transition-colors duration-200 ease-in-out ${
+                  selectedDevice !== "All" &&
                   device.device_id === selectedDevice?.device_id
                     ? "bg-blue-400 text-white"
                     : "hover:bg-blue-100"

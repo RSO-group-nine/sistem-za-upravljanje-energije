@@ -1,21 +1,47 @@
 "use client";
-import { useState, useEffect, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 import SideBar from "../components/sideBar";
 import DeviceComponent from "../components/deviceComponent";
 import Device from "@/app/entities/device";
 import getUserDevices from "@/app/utils/getUserDevices";
 
 export default function Page() {
-  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<Device | "All" | null>(
+    null
+  );
   const [devices, setDevices] = useState<Device[]>([]);
-  const [deviceData, setDeviceData] = useState(null);
+  const [deviceData, setDeviceData] = useState<
+    {
+      body: {
+        date: string;
+        temperature: number;
+      };
+      systemProperties: {
+        "iothub-enqueuedtime": string;
+        "iothub-connection-device-id": string;
+      };
+      ID: string;
+    }[]
+  >([]);
 
   // Update the selected device
-  const handleDeviceSelect = (device: Device) => {
+  const handleDeviceSelect = (device: Device | "All") => {
     setSelectedDevice(device);
   };
 
-  const handleDeviceData = (data: SetStateAction<null>) => {
+  const handleDeviceData = (
+    data: {
+      body: {
+        date: string;
+        temperature: number;
+      };
+      systemProperties: {
+        "iothub-enqueuedtime": string;
+        "iothub-connection-device-id": string;
+      };
+      ID: string;
+    }[]
+  ) => {
     setDeviceData(data);
   };
 

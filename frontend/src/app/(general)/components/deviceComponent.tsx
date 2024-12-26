@@ -3,8 +3,18 @@ import GptPrompt from "./gptPrompt";
 import Device from "@/app/entities/device";
 
 interface DeviceComponentProps {
-  device: Device;
-  deviceDataG: any;
+  device: Device | "All" | null;
+  deviceDataG: {
+    body: {
+      date: string;
+      temperature: number;
+    };
+    systemProperties: {
+      "iothub-enqueuedtime": string;
+      "iothub-connection-device-id": string;
+    };
+    ID: string;
+  }[];
 }
 
 export default function DeviceComponent({
@@ -23,7 +33,7 @@ export default function DeviceComponent({
   return (
     <div className="container flex flex-col gap-4">
       <h1 className="text-blue-500">
-        {device.az_connection_string
+        {device !== "All" && device?.az_connection_string
           ? getDeviceIdFromCS(device.az_connection_string)
           : "All"}
       </h1>
