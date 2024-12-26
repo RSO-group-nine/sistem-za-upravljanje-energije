@@ -32,17 +32,14 @@ export default function LoginForm() {
     password: string;
   }): Promise<void> => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_PATH}/users/login`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      const response = await fetch(`/api/v1/users/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
       if (!response.ok) {
         setLogin(false);
