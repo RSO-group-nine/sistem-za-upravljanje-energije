@@ -34,7 +34,7 @@ module.exports = {
 
 				whitelist: ["**"],
 				cors: {
-					origin: ["http://localhost:3000", "http://localhost:5000", "https://sistem-za-upravljanje-energije-91846956206.europe-central2.run.app"], // Allow all origins for testing purposes
+					origin: true, // Allow all origins
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
 					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
 					exposedHeaders: [],
