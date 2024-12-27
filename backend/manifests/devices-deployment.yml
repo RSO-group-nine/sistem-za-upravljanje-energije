@@ -1,26 +1,26 @@
 #########################################################
-# Device service
+# Devices service
 #########################################################
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: device-deployment
+  name: devices-deployment
   namespace: default
   labels:
-    name: device-deployment
+    name: devices-deployment
     app: sistem-za-upravljanje-energije
 spec:
   selector:
     matchLabels:
-      app: device
+      app: devices
   replicas: 2
   template:
     metadata:
       labels:
-        app: device
+        app: devices
     spec:
       containers:
-        - name: device
+        - name: devices
           image: zigac24/sistem-za-upravljanje-energije:molecular_v1
           imagePullPolicy: Always
           envFrom:
@@ -30,7 +30,7 @@ spec:
                 name: molecular-secrets
           env:
             - name: SERVICES
-              value: device
+              value: devices
           resources:
             limits:
               cpu: 200m
