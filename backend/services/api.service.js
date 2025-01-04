@@ -34,10 +34,10 @@ module.exports = {
 
 				whitelist: ["**"],
 				cors: {
-					origin: ["http://localhost:3000", "http://localhost:5000", "https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app"], // Allow all origins for testing purposes
+					origin: ["http://localhost:3000", "http://localhost:5000", "https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app", "http://192.168.64.100:3000"], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
-					allowedHeaders: ["Content-Type", "Authorization"], // Add Content-Type here
-					exposedHeaders: [],
+					allowedHeaders: ["Content-Type"], // Add Content-Type here
+					exposedHeaders: ["Set-Cookie"],
 					credentials: true,
 					maxAge: 3600,
 				},
