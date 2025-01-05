@@ -72,12 +72,8 @@ jobs:
 
       # Set up kubectl
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
+        uses: matootie/dokube@v1.4.1
         with:
-          version: "v1.30.5"
-
-      # Authenticate to DigitalOcean Kubernetes
-      - name: Authenticate to DigitalOcean Kubernetes
-        run: |
-          doctl auth init -t ${{ secrets.DIGITALOCEAN_API_TOKEN }}
-          doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_K8S_CLUSTER_NAME }}
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          clusterName: ${{ secrets.DIGITALOCEAN_K8S_CLUSTER_NAME }}
+          version: "1.31.1"
