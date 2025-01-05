@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
+import env from "@beam-australia/react-env";
 
 const LoginFormSchema = Yup.object().shape({
   email: Yup.string()
@@ -27,24 +28,22 @@ export default function LoginForm() {
   const router = useRouter();
   const [login, setLogin] = useState(true);
   const [redirect, setRedirect] = useState(false);
-  const [,setCookie, ] = useCookies(['token']);
+  const [, setCookie] = useCookies(["token"]);
 
   const handleLogin = async (values: {
     email: string;
     password: string;
   }): Promise<void> => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_PATH}/users/login`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      const apiUrl = env("NEXT_PUBLIC_API_PATH");
+      const response = await fetch(`${apiUrl}/users/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
       if (!response.ok) {
         setLogin(false);
         setRedirect(false);
