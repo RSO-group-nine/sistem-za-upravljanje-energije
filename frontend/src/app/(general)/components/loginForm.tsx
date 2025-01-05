@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
-import { Cookies, useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 
 const LoginFormSchema = Yup.object().shape({
   email: Yup.string()
@@ -27,7 +27,7 @@ export default function LoginForm() {
   const router = useRouter();
   const [login, setLogin] = useState(true);
   const [redirect, setRedirect] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(['token']);
+  const [,setCookie, ] = useCookies(['token']);
 
   const handleLogin = async (values: {
     email: string;

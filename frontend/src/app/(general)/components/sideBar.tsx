@@ -39,7 +39,7 @@ export default function SideBar({
     devices[0] ?? null
   );
 
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [, , removeCookie] = useCookies(["token"]);
 
   async function fetchTheData() {
     try {
