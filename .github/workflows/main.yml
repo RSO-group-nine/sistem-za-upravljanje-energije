@@ -37,6 +37,7 @@ jobs:
       # Run Docker Compose to build and push the images
       - name: Build and push Docker images with npm scripts
         run: |
+          cd backend
           npm install
           npm run dc:down
           npm run dc:up
