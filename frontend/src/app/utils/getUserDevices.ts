@@ -1,6 +1,9 @@
+import { baseURL } from "./baseUrl";
+
+
 export default async function getUserDevices(user_id: string) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/devices?userId=${user_id}`, {
+        const response = await fetch(`${baseURL}/devices?userId=${user_id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

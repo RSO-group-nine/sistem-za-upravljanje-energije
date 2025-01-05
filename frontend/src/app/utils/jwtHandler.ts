@@ -1,6 +1,8 @@
+import { baseURL } from "./baseUrl";
+
 export default async function verifyUser(token: string) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/resolve`, {
+        const response = await fetch(`${baseURL}/users/resolve`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

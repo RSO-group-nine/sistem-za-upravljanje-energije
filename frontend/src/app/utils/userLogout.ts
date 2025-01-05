@@ -1,5 +1,7 @@
+import { baseURL } from "./baseUrl";
+
 export default async function userLogout() {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users/logout`, {
+    const response = await fetch(`${baseURL}/users/logout`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

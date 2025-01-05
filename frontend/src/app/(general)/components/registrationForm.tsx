@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { baseURL } from "../../utils/baseUrl";
 
 // Define validation schema using Yup
 const RegistrationSchema = Yup.object().shape({
@@ -42,7 +43,7 @@ export default function RegistrationForm() {
   }): Promise<void> => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_PATH}/users/register`,
+        `${baseURL}/users/register`,
         {
           method: "POST",
           headers: {

@@ -1,4 +1,5 @@
 import Device from "../entities/device";
+import { baseURL } from "./baseUrl";
 
 export interface Props {
     device: Device;
@@ -8,7 +9,7 @@ export default async function getDeviceReadings(device: Device) {
     const az_device_id = device.az_device_id;
     const id = device.device_id;
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/devices/info`, {
+        const response = await fetch(`${baseURL}/devices/info`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

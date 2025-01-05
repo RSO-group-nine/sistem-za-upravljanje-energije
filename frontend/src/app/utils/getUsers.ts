@@ -1,5 +1,7 @@
+import { baseURL } from "./baseUrl";
+
 export default async function getUser() {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/users`, {
+    const response = await fetch(`${baseURL}/users`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { baseURL } from "../../utils/baseUrl";
 
 // Define validation schema using Yup
 const PromptSchema = Yup.object().shape({
@@ -69,16 +70,13 @@ export default function GptPrompt({ data }: ConsumptionGraphProps) {
 
       console.log("Prompt input:", promptInput);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_PATH}/gpt/prompt`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt: promptInput }),
-        }
-      );
+      const res = await fetch(`${baseURL}/gpt/prompt`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: promptInput }),
+      });
 
       if (!res.ok) {
         const message = `An error has occurred: ${res.status}`;
