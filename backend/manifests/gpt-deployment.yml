@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: gpt
-          image: zigac24/sistem-za-upravljanje-energije:molecular_v1
+          image: zigac24/sistem-za-upravljanje-energije:latest
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

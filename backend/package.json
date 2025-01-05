@@ -12,7 +12,7 @@
     "dc:up": "docker-compose up --build -d",
     "dc:logs": "docker-compose logs -f",
     "dc:down": "docker-compose down",
-    "dc:push": "docker push zigac24/sistem-za-upravljanje-energije:molecular_v1"
+    "dc:push": "docker push zigac24/sistem-za-upravljanje-energije:latest"
   },
   "keywords": [
     "microservices",

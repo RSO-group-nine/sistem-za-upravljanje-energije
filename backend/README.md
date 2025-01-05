@@ -47,7 +47,7 @@ Run npm run "script_name"
 "dc:up": "docker-compose up --build -d",
 "dc:down": "docker-compose down",
 "dc:logs": "docker-compose logs -f",
-"dc:push": "docker push zigac24/sistem-za-upravljanje-energije:molecular_v1"
+"dc:push": "docker push zigac24/sistem-za-upravljanje-energije:latest"
 ```
 
 Deploy to Kubernetes
