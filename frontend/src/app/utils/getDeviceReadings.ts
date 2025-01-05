@@ -8,6 +8,7 @@ export interface Props {
 export default async function getDeviceReadings(device: Device) {
     const az_device_id = device.az_device_id;
     const id = device.device_id;
+    console.log(`Fetching device readings for device ${az_device_id}...`);
     try {
         const response = await fetch(`${baseURL}/devices/info`, {
             method: 'POST',
@@ -26,7 +27,7 @@ export default async function getDeviceReadings(device: Device) {
         console.log(`Device readings for device ${az_device_id}`, data);
         return data;
     } catch (error) {
-        console.error('Failed to fetch device readings:', error);
-        throw error;
+        console.log('Failed to fetch device readings:', error);
+        return [];
     }
 }

@@ -8,8 +8,8 @@ import { useCookies } from "react-cookie";
 
 export interface SideBarProps {
   devices: Device[];
-  device: Device | "All";
-  onSelect: (device: Device | "All") => void;
+  device: Device | "All" | null;
+  onSelect: (device: Device | "All" | null) => void;
   onData: (
     data: {
       body: {
@@ -46,6 +46,9 @@ export default function SideBar({
       if (device === "All") {
         return;
       }
+      if (device === null) {
+        return;
+      }
       const data = await getDeviceReadings(device);
       setDeviceData(data);
     } catch (error) {
@@ -55,7 +58,6 @@ export default function SideBar({
 
   async function fetchAllDevicesData() {
     try {
-      console.log("Fetching devices...");
       const data = [];
 
       for (const device of devices) {
@@ -99,7 +101,6 @@ export default function SideBar({
       removeCookie("token");
       sessionStorage.removeItem("email");
       sessionStorage.removeItem("id");
-      console.log("Logged out");
 
       // Redirect to login
       router.push("/login");
@@ -120,7 +121,7 @@ export default function SideBar({
         await fetchAllDevicesData();
         setFetchId(-1);
       } else if (
-        device !== "All" &&
+        device  && device !== "All" &&
         device.device_id !== null &&
         fetchId !== device.device_id
       ) {
@@ -143,7 +144,7 @@ export default function SideBar({
           Devices
         </h1>
         {loading ? (
-          <div className="p-4 text-center text-blue-500">Fetching data...</div>
+          <div className="p-4 text-center text-blue-500">{devices ? "You have no registred devices." : "Fetching data.."}</div>
         ) : (
           <ul className="flex flex-col mt-4">
             <li

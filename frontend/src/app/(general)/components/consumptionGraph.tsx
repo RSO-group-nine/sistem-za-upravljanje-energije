@@ -24,8 +24,6 @@ interface ConsumptionGraphProps {
 }
 
 export default function ConsumptionGraph({ data }: ConsumptionGraphProps) {
-  // Format data for Recharts
-  console.log("ConsumptionGraph data:", data);
 
   // Group data by device ID
   const groupedData = data.reduce((acc, item) => {

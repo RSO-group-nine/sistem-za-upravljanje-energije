@@ -23,9 +23,10 @@ export default function Page() {
       ID: string;
     }[]
   >([]);
+  
 
   // Update the selected device
-  const handleDeviceSelect = (device: Device | "All") => {
+  const handleDeviceSelect = (device: Device | "All" | null) => {
     setSelectedDevice(device);
   };
 
@@ -47,19 +48,23 @@ export default function Page() {
 
   const handleGetDevices = async (userId: string) => {
     try {
-      const devices = await getUserDevices(userId);
+      const intUserId = parseInt(userId);
+      const devices = await getUserDevices(intUserId);
+      console.log("Devices:", devices);
       if (devices && devices.length > 0) {
         setDevices(devices);
         setSelectedDevice(devices[0]); // Set the first device as the default selected Device
       }
     } catch (error) {
       console.error("Error fetching devices:", error);
+      setDevices([]);
     }
   };
 
   useEffect(() => {
     // const emailFromStorage = sessionStorage.getItem("email") ?? "";
     const idFromStorage = sessionStorage.getItem("id") ?? "";
+    console.log("ID from storage:", idFromStorage);
     if (idFromStorage) {
       handleGetDevices(idFromStorage);
     }
@@ -68,7 +73,7 @@ export default function Page() {
   return (
     <div className="flex h-full">
       <div className="">
-        {selectedDevice && (
+        {(
           <SideBar
             devices={devices}
             device={selectedDevice}
