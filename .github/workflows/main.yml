@@ -81,9 +81,9 @@ jobs:
       - name: Deploy to DigitalOcean Kubernetes
         run: |
           cd backend/manifests
-          kubectl set image deployment/devices-deployment devices=zigac24/sistem-za-upravljanje-energije:molecular_v1
-          kubectl set image deployment/gpt-deployment gpt=zigac24/sistem-za-upravljanje-energije:molecular_v1
-          kubectl set image deployment/openapi-deployment openapi=zigac24/sistem-za-upravljanje-energije:molecular_v1
-          kubectl set image deployment/users-deployment users=zigac24/sistem-za-upravljanje-energije:molecular_v1
-          kubectl set image deployment/api api=zigac24/sistem-za-upravljanje-energije:molecular_v1
+          kubectl delete pods --selector=app=api
+          kubectl delete pods --selector=app=devices
+          kubectl delete pods --selector=app=gpt
+          kubectl delete pods --selector=app=openapi
+          kubectl delete pods --selector=app=users
           kubectl apply -f .
