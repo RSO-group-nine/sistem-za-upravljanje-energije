@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Device from "@/app/entities/device";
 import userLogout from "@/app/utils/userLogout";
 import getDeviceReadings from "@/app/utils/getDeviceReadings";
+import { useCookies } from "react-cookie";
 
 export interface SideBarProps {
   devices: Device[];
@@ -37,6 +38,8 @@ export default function SideBar({
   const [selectedDevice, setSelectedDevice] = useState<Device | "All" | null>(
     devices[0] ?? null
   );
+
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
   async function fetchTheData() {
     try {
@@ -91,9 +94,9 @@ export default function SideBar({
 
   const handleLogout = async () => {
     const response = await userLogout();
-    console.log(response);
     // Clear sessionStorage
     if (response.status == "success") {
+      removeCookie("token");
       sessionStorage.removeItem("email");
       sessionStorage.removeItem("id");
       console.log("Logged out");

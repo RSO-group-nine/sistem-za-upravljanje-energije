@@ -117,7 +117,7 @@ module.exports = {
 					"Set-Cookie": `token=${token}; HttpOnly; Secure; Path=/; Max-Age=86400; SameSite=Strict`,
 				};
 
-				return entity;
+				return {...entity, token};
 			},
 		},
 		userLogout: {
