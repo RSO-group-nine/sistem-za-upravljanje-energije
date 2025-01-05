@@ -36,6 +36,20 @@ jobs:
 
       # Run Docker Compose to build and push the images
       - name: Build and push Docker images with npm scripts
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          PORT: ${{ secrets.PORT }}
+          API_VERSION: ${{ secrets.API_VERSION }}
+          API_KEY: ${{ secrets.API_KEY }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_URI: ${{ secrets.POSTGRES_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          IOT_HUB_CONNECTION_STRING: ${{ secrets.IOT_HUB_CONNECTION_STRING }}
         run: |
           cd backend
           npm install
