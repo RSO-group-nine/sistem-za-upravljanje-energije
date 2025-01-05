@@ -118,7 +118,7 @@ jobs:
       # Deploy to DigitalOcean Kubernetes
       - name: Deploy to DigitalOcean Kubernetes
         run: |
+          cd manifests
           kubectl create configmap molecular-configmap --from-env-file=./.env --namespace=default
           kubectl create secret generic molecular-secrets --from-env-file=./.secret --namespace=default
-          cd manifests
           kubectl apply -f .
