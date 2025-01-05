@@ -3,7 +3,7 @@ name: CI/CD Pipeline to Deploy to DigitalOcean Kubernetes
 on:
   push:
     branches:
-      - main  # Trigger the pipeline on pushes to the main branch
+      - main # Trigger the pipeline on pushes to the main branch
 
 jobs:
   build:
@@ -14,9 +14,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Set up Docker and Docker Compose
+      # Set up Docker
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
+
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
       # Cache Docker layers to speed up builds
       - name: Cache Docker layers
@@ -27,10 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      # Build Docker images using Docker Compose
-      - name: Build and push Docker images using Docker Compose
+      # Run Docker Compose to build and push the images
+      - name: Build and push Docker images with npm scripts
         run: |
-          docker-compose -f docker-compose.yml build
-          docker-compose -f docker-compose.yml push
-        env:
-          DOCKER_BUILDKIT: 1
+          npm install
+          npm run dc:down
+          npm run dc:up
+          npm run dc:push
