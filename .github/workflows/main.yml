@@ -3,7 +3,7 @@ name: CI/CD Pipeline to Deploy to DigitalOcean Kubernetes
 on:
   push:
     branches:
-      - main # Trigger the pipeline on pushes to the main branch
+      - main
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      # Create .env file
+      # Create .env backend file
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0
         with:
@@ -76,3 +76,49 @@ jobs:
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
           clusterName: ${{ secrets.DIGITALOCEAN_K8S_CLUSTER_NAME }}
+
+      # Create .env manifests file
+      - name: Create .env manifests file
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_NODE_ENV: "production"
+          envkey_PORT: "3000"
+          envkey_NAMESPACE: "sistem-za-upravljanje-energije-prod"
+          envkey_LOGLEVEL: "info"
+          envkey_TRANSPORTER: "nats://nats:4222"
+          envkey_CACHER: "redis://redis:6379"
+          envkey_SERVICEDIR: "services"
+          envkey_APM_SERVICE_NAME: ""
+          envkey_MOLECULER_APM_ENABLE: ""
+          directory: backend/manifests
+          file_name: .env
+          fail_on_empty: false
+          sort_keys: false
+
+      # Create .secret manifests file
+      - name: Create .secret manifests file
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_PORT: ${{ secrets.PORT }}
+          envkey_API_VERSION: ${{ secrets.API_VERSION }}
+          envkey_API_KEY: ${{ secrets.API_KEY }}
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_DB_NAME: ${{ secrets.DB_NAME }}
+          envkey_DB_USER: ${{ secrets.DB_USER }}
+          envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          envkey_POSTGRES_URI: ${{ secrets.POSTGRES_URI }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          envkey_IOT_HUB_CONNECTION_STRING: ${{ secrets.IOT_HUB_CONNECTION_STRING }}
+          directory: backend/manifests
+          file_name: .secret
+          fail_on_empty: false
+          sort_keys: false
+
+      # Deploy to DigitalOcean Kubernetes
+      - name: Deploy to DigitalOcean Kubernetes
+        run: |
+          kubectl create configmap molecular-configmap --from-env-file=./.env --namespace=default
+          kubectl create secret generic molecular-secrets --from-env-file=./.secret --namespace=default
+          cd manifests
+          kubectl apply -f .
