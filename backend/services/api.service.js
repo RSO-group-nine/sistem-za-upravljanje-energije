@@ -36,12 +36,12 @@ module.exports = {
 				cors: {
 					origin: ["http://localhost:3000", "http://localhost:5000", "https://rso-frontend.vercel.app", "https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app", "http://192.168.64.100:3000", "https://sistem-za-upravljanje-energije-91846956206.europe-west3.run.app"], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
-					allowedHeaders: ["Content-Type"], // Add Content-Type here
+					allowedHeaders: ["Content-Type", "Authorization"],
 					exposedHeaders: ["Set-Cookie"],
 					credentials: true,
 					maxAge: 3600,
 				},
-				
+
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
 
