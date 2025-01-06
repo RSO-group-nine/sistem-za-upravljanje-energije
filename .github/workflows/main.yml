@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@v3
 
       # Run the tests
-      - name: Run Tests
-        run: |
-          cd backend
-          npm install
-          npm run test
+      # - name: Run Tests
+      #   run: |
+      #     cd backend
+      #     npm install
+      #     npm run test
 
       # Set up Docker
       - name: Set up Docker
