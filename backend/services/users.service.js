@@ -82,6 +82,38 @@ module.exports = {
 			},
 		},
 
+		userDelete: {
+			rest: "POST /delete",
+			params: {
+				email: "email",
+			},
+			async handler(ctx) {
+				const { email } = ctx.params;
+				const user = await this.adapter.findOne({ where: { email } });
+
+				if (!user) {
+					throw new MoleculerClientError("User not found", 404, "", [
+						{ field: "email", message: "is not found" },
+					]);
+				}
+
+				await this.adapter.removeById(user.id);
+				return {
+					status: "success",
+					message: "User deleted successfully",
+				};
+			},
+		},
+
+		// Fetch all users
+		fetchAllUsers: {
+			rest: "GET /users",
+			async handler() {
+				const users = await this.adapter.find({});
+				return users;
+			},
+		},
+
 		userLogin: {
 			rest: "POST /login",
 			params: {
@@ -117,7 +149,7 @@ module.exports = {
 					"Set-Cookie": `token=${token}; HttpOnly; Secure; Path=/; Max-Age=86400; SameSite=Strict`,
 				};
 
-				return {...entity, token};
+				return { ...entity, token };
 			},
 		},
 		userLogout: {
@@ -137,15 +169,15 @@ module.exports = {
 			async handler(ctx) {
 				const user_id = ctx.params.user_id;
 				this.logger.info(`Fetching user with ID: ${user_id}`);
-	
+
 				const user = await this.getById(user_id);
-	
+
 				this.logger.info(`User found: ${user}`);
-	
+
 				if (!user) {
 					throw new MoleculerClientError("User not found", 404);
 				}
-	
+
 				return user;
 			},
 		},
