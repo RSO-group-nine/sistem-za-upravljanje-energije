@@ -1,9 +1,10 @@
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
-const ApiService = require("../../services/api.service");
 const UsersService = require("../../services/users.service");
-
+const DevicesService = require("../../services/devices.service");
+const GptService = require("../../services/gpt.service");
+const ApiServices = require("../../services/api.service");
 describe("Test Users Service", () => {
 	let broker;
 
@@ -12,9 +13,11 @@ describe("Test Users Service", () => {
 		broker = new ServiceBroker({ logger: false });
 
 		// Load the service
+		// Load the services
 		broker.createService(UsersService);
-		broker.createService(ApiService);
-
+		broker.createService(DevicesService);
+		broker.createService(GptService);
+		broker.createService(ApiServices);
 		// Start the broker
 		await broker.start();
 	});

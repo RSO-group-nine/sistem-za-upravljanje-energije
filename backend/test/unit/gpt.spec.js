@@ -1,6 +1,5 @@
 const { ServiceBroker } = require("moleculer");
 const gptService = require("../../services/gpt.service");
-const ApiService = require("../../services/api.service");
 const helpers = require("../../utils/promptHelper");
 
 jest.mock("../../utils/promptHelper", () => ({
