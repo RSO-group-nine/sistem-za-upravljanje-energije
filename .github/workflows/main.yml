@@ -87,10 +87,5 @@ jobs:
       # Deploy to DigitalOcean Kubernetes
       - name: Deploy to DigitalOcean Kubernetes
         run: |
-          cd backend/manifests
-          kubectl delete pods --selector=app=api
-          kubectl delete pods --selector=app=devices
-          kubectl delete pods --selector=app=gpt
-          kubectl delete pods --selector=app=openapi
-          kubectl delete pods --selector=app=users
-          kubectl apply -f .
+          cd backend/manifests/my-chart
+          helm upgrade helm-test .
