@@ -1,13 +1,16 @@
 import { baseURL } from "./baseUrl";
 
 
-export default async function getUserDevices(user_id: string) {
+export default async function getUserDevices(string_user_id: string) {
+    const user_id = parseInt(string_user_id);
+
     try {
-        const response = await fetch(`${baseURL}/devices?userId=${user_id}`, {
-            method: 'GET',
+        const response = await fetch(`${baseURL}/devices/getUserDevices`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ user_id }),
         });
 
         if (!response.ok) {
@@ -15,7 +18,9 @@ export default async function getUserDevices(user_id: string) {
         }
 
         const data = await response.json();
-        return data.rows;
+        console.log('Response to getUserDevices :', data);
+        // console.log('Response to getUserDevices :', data.rows);
+        return data;
     } catch (error) {
         console.error('Failed to fetch devices:', error);
         throw error;

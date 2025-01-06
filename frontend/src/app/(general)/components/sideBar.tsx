@@ -135,7 +135,7 @@ export default function SideBar({
   }, [device]);
 
   return (
-    <aside className="bg-white text-gray-800 w-64 h-screen shadow-lg flex flex-col">
+    <aside className="bg-white text-gray-800 w-64 h-full shadow-lg flex flex-col">
       <div className="text-neutral-500 p-4 bg-blue-100 flex justify-center items-center rounded-md shadow-lg m-4">
         <h1 className="font-bold">{email}</h1>
       </div>
@@ -143,8 +143,10 @@ export default function SideBar({
         <h1 className="text-3xl font-bold text-blue-500 p-6 border-b border-gray-200">
           Devices
         </h1>
-        {loading ? (
-          <div className="p-4 text-center text-blue-500">{devices ? "You have no registred devices." : "Fetching data.."}</div>
+        {devices.length === 0 ? (
+          <div className="p-4 text-center text-blue-500">No devices found</div>
+        ) : loading ? (
+          <div className="p-4 text-center text-blue-500">Fetching data...</div>
         ) : (
           <ul className="flex flex-col mt-4">
             <li
@@ -190,3 +192,4 @@ export default function SideBar({
     </aside>
   );
 }
+  

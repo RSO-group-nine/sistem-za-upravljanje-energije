@@ -48,8 +48,7 @@ export default function Page() {
 
   const handleGetDevices = async (userId: string) => {
     try {
-      const intUserId = parseInt(userId);
-      const devices = await getUserDevices(intUserId);
+      const devices = await getUserDevices(userId);
       console.log("Devices:", devices);
       if (devices && devices.length > 0) {
         setDevices(devices);

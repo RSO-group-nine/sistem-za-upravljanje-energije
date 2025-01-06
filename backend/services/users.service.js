@@ -129,6 +129,26 @@ module.exports = {
 				return { status: "success" };
 			},
 		},
+		getUserById: {
+			rest: "POST /getUserById",
+			params: {
+				user_id: "number",
+			},
+			async handler(ctx) {
+				const user_id = ctx.params.user_id;
+				this.logger.info(`Fetching user with ID: ${user_id}`);
+	
+				const user = await this.getById(user_id);
+	
+				this.logger.info(`User found: ${user}`);
+	
+				if (!user) {
+					throw new MoleculerClientError("User not found", 404);
+				}
+	
+				return user;
+			},
+		},
 		/**
 		 * Get user by JWT token (for API GW authentication)
 		 *
@@ -162,23 +182,6 @@ module.exports = {
 
 				if (decoded.id) return this.getById(decoded.id);
 			},
-		},
-	},
-	getUserById: {
-		rest: "GET /:user_id",
-		async handler(ctx) {
-			const user_id = ctx.params.user_id;
-			this.logger.info(`Fetching user with ID: ${user_id}`);
-
-			const user = await this.getById(user_id);
-
-			this.logger.info(`User found: ${user}`);
-
-			if (!user) {
-				throw new MoleculerClientError("User not found", 404);
-			}
-
-			return user;
 		},
 	},
 	methods: {

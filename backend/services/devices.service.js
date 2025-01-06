@@ -69,10 +69,10 @@ module.exports = {
 	actions: {
 		// Create a new user
 		getUserDevices: {
-			rest: "GET /:user_id",
+			rest: "POST /getUserDevices",
 			// Use GET for fetching data
 			params: {
-				user_id: "string",
+				user_id: "number",
 			},
 			async handler(ctx) {
 				this.logger.info(
@@ -96,10 +96,11 @@ module.exports = {
 				}
 
 				const user_email = user.email; // Assuming user object has the email field
+				this.logger.info(`User email: ${user_email}`);
 
-				// Now, use the 'include' option to join the 'device' table with the 'user' table
+				// Ta vrstica ne dela iz nekega razloga
 				const devices = await this.adapter.find({
-					where: { user_email },
+					where: { user_email: user_email },
 				});
 
 				this.logger.info(`Devices found: ${devices}`);
@@ -110,8 +111,12 @@ module.exports = {
 						404
 					);
 				}
-
-				return { devices, user };
+				
+				const result = devices
+					.filter((device) => device.user_email === user_email)
+					.map((device) => device.toJSON());
+				this.logger.info(`Result: ${result}`);
+				return JSON.parse(JSON.stringify(result));
 			},
 		},
 		getDeviceInfo: {
