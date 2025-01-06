@@ -5,7 +5,7 @@ export interface Props {
     device: Device;
 }
 
-export default async function getDeviceReadings(device: Device) {
+export default async function getDeviceReadings(device: Device, token: string) {
     const az_device_id = device.az_device_id;
     const id = device.device_id;
     console.log(`Fetching device readings for device ${az_device_id}...`);
@@ -14,6 +14,7 @@ export default async function getDeviceReadings(device: Device) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ id }),
         });

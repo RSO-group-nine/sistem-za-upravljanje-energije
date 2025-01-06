@@ -147,6 +147,7 @@ module.exports = {
 				if (type === "Token" || type === "Bearer")
 					token = req.headers.authorization.split(" ")[1];
 			}
+
 			let user;
 			if (token) {
 				// Verify JWT token
@@ -171,7 +172,7 @@ module.exports = {
 				}
 			}
 
-			if (!user)
+			if (!user && req.headers.authorization)
 				throw new UnAuthorizedError();
 		},
 		async authenticate(ctx, route, req, res) {
@@ -206,7 +207,7 @@ module.exports = {
 				}
 			}
 
-			if (!user)
+			if (!user && req.headers.authorization)
 				throw new UnAuthorizedError();
 		},
 	},

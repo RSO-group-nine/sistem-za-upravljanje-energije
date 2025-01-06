@@ -4,6 +4,7 @@ import SideBar from "../components/sideBar";
 import DeviceComponent from "../components/deviceComponent";
 import Device from "@/app/entities/device";
 import getUserDevices from "@/app/utils/getUserDevices";
+import { useCookies } from "react-cookie";
 
 export default function Page() {
   const [selectedDevice, setSelectedDevice] = useState<Device | "All" | null>(
@@ -23,6 +24,8 @@ export default function Page() {
       ID: string;
     }[]
   >([]);
+  const [cookie] = useCookies(["token"]);
+  const tkn = cookie.token ?? "";
   
 
   // Update the selected device
@@ -48,7 +51,7 @@ export default function Page() {
 
   const handleGetDevices = async (userId: string) => {
     try {
-      const devices = await getUserDevices(userId);
+      const devices = await getUserDevices(userId, tkn);
       console.log("Devices:", devices);
       if (devices && devices.length > 0) {
         setDevices(devices);

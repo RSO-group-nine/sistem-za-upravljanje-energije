@@ -39,7 +39,9 @@ export default function SideBar({
     devices[0] ?? null
   );
 
-  const [, , removeCookie] = useCookies(["token"]);
+  const [cookie, , removeCookie] = useCookies(["token"]);
+
+  const tkn = cookie.token ?? "";
 
   async function fetchTheData() {
     try {
@@ -49,7 +51,7 @@ export default function SideBar({
       if (device === null) {
         return;
       }
-      const data = await getDeviceReadings(device);
+      const data = await getDeviceReadings(device, tkn);
       setDeviceData(data);
     } catch (error) {
       console.error("Error fetching device data:", error);
@@ -62,7 +64,7 @@ export default function SideBar({
 
       for (const device of devices) {
         await delay(1000); // Delay of 1 second between each call
-        const deviceData = await getDeviceReadings(device);
+        const deviceData = await getDeviceReadings(device, tkn);
         data.push(deviceData);
       }
       const flattenedData = data.flat();
@@ -95,7 +97,7 @@ export default function SideBar({
   };
 
   const handleLogout = async () => {
-    const response = await userLogout();
+    const response = await userLogout(tkn);
     // Clear sessionStorage
     if (response.status == "success") {
       removeCookie("token");
