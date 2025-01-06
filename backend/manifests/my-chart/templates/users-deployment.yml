@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.users.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.users.name }}
+    app: {{ .Values.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.users.appLabel }}
+  replicas: {{ .Values.users.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.users.appLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.users.containerName }}
+          image: {{ .Values.users.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.users.configMapName }}
+            - secretRef:
+                name: {{ .Values.users.secretName }}
+          env:
+            - name: SERVICES
+              value: {{ .Values.users.serviceValue }}
+          resources:
+            limits:
+              cpu: {{ .Values.users.resources.limits.cpu }}
+              memory: {{ .Values.users.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.users.resources.requests.cpu }}
+              memory: {{ .Values.users.resources.requests.memory }}

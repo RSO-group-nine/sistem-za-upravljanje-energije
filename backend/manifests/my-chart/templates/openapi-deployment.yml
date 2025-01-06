@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.openapi.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.openapi.name }}
+    app: {{ .Values.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.openapi.appLabel }}
+  replicas: {{ .Values.openapi.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.openapi.appLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.openapi.containerName }}
+          image: {{ .Values.openapi.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.openapi.configMapName }}
+            - secretRef:
+                name: {{ .Values.openapi.secretName }}
+          env:
+            - name: SERVICES
+              value: {{ .Values.openapi.serviceValue }}
+          resources:
+            limits:
+              cpu: {{ .Values.openapi.resources.limits.cpu }}
+              memory: {{ .Values.openapi.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.openapi.resources.requests.cpu }}
+              memory: {{ .Values.openapi.resources.requests.memory }}

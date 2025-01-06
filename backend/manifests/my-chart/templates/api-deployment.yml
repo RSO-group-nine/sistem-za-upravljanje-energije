@@ -1,0 +1,64 @@
+#########################################################
+# Service for Moleculer API Gateway service
+#########################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.api.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.api.name }}
+    app: {{ .Values.app }}
+spec:
+  selector:
+    app: {{ .Values.api.name }}
+  ports:
+    - port: {{ .Values.api.port }}
+      targetPort: {{ .Values.api.port }}
+  type: {{ .Values.api.serviceType }}
+
+---
+#########################################################
+# API Gateway Deployment
+#########################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.api.name }}
+    app: {{ .Values.app }}
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.api.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.api.name }}
+    spec:
+      containers:
+        - name: {{ .Values.api.name }}
+          image: {{ .Values.api.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.api.configMapName }}
+            - secretRef:
+                name: {{ .Values.api.secretName }}
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: {{ .Values.api.port }}
+          env:
+            - name: SERVICES
+              value: {{ .Values.api.serviceName }}
+          resources:
+            limits:
+              cpu: {{ .Values.api.resources.limits.cpu }}
+              memory: {{ .Values.api.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.api.resources.requests.cpu }}
+              memory: {{ .Values.api.resources.requests.memory }}

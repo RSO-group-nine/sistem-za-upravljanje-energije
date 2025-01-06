@@ -1,0 +1,134 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nats.configMapName }}
+  namespace: {{ .Values.namespace }}
+data:
+  nats.conf: |
+    pid_file: "/var/run/nats/nats.pid"
+    http: {{ .Values.nats.httpPort }}
+
+    cluster {
+      port: {{ .Values.nats.clusterPort }}
+      routes [
+        {{ range .Values.nats.clusterRoutes }}
+        {{ . }}
+        {{ end }}
+      ]
+
+      cluster_advertise: $CLUSTER_ADVERTISE
+      connect_retries: {{ .Values.nats.connectRetries }}
+    }
+
+    leafnodes {
+      port: {{ .Values.nats.leafnodePort }}
+    }
+    max_payload: {{ .Values.nats.maxPayload }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.nats.serviceName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.nats.appLabel }}
+spec:
+  selector:
+    app: {{ .Values.nats.appLabel }}
+  clusterIP: None
+  ports:
+    - name: client
+      port: {{ .Values.nats.ports.client }}
+    - name: cluster
+      port: {{ .Values.nats.ports.cluster }}
+    - name: monitor
+      port: {{ .Values.nats.ports.monitor }}
+    - name: metrics
+      port: {{ .Values.nats.ports.metrics }}
+    - name: leafnodes
+      port: {{ .Values.nats.ports.leafnodes }}
+    - name: gateways
+      port: {{ .Values.nats.ports.gateways }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.nats.statefulSetName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.nats.appLabel }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.nats.appLabel }}
+  replicas: {{ .Values.nats.replicas }}
+  serviceName: {{ .Values.nats.serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nats.appLabel }}
+    spec:
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Values.nats.configMapName }}
+        - name: pid
+          emptyDir: {}
+      shareProcessNamespace: true
+      terminationGracePeriodSeconds: {{ .Values.nats.terminationGracePeriod }}
+      containers:
+        - name: nats
+          image: {{ .Values.nats.image }}
+          ports:
+            - containerPort: {{ .Values.nats.ports.client }}
+              name: client
+            - containerPort: {{ .Values.nats.ports.leafnodes }}
+              name: leafnodes
+            - containerPort: {{ .Values.nats.ports.cluster }}
+              name: cluster
+            - containerPort: {{ .Values.nats.ports.monitor }}
+              name: monitor
+            - containerPort: {{ .Values.nats.ports.metrics }}
+              name: metrics
+          command:
+            - "nats-server"
+            - "--config"
+            - "/etc/nats-config/nats.conf"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CLUSTER_ADVERTISE
+              value: $(POD_NAME).nats.$(POD_NAMESPACE).svc
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/nats-config
+            - name: pid
+              mountPath: /var/run/nats
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.nats.ports.monitor }}
+            initialDelaySeconds: {{ .Values.nats.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.nats.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.nats.ports.monitor }}
+            initialDelaySeconds: {{ .Values.nats.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.nats.readinessProbe.timeoutSeconds }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  [
+                    "/bin/sh",
+                    "-c",
+                    "/nats-server -sl=ldm=/var/run/nats/nats.pid && /bin/sleep {{ .Values.nats.terminationGracePeriod }}",
+                  ]
