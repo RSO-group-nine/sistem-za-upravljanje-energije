@@ -155,27 +155,27 @@ module.exports = {
 					if (user) {
 						this.logger.info(
 							"Authenticated via JWT: ",
-							user.username
+							user.email
 						);
 						// Reduce user fields (it will be transferred to other nodes)
 						ctx.meta.user = _.pick(user, [
 							"id",
-							"username",
 							"email",
 						]);
 						ctx.meta.token = token;
-						ctx.meta.userID = user._id;
+						ctx.meta.userID = user.id;
 					}
 				} catch (err) {
 					// Ignored because we continue processing if user doesn't exists
+					throw new UnAuthorizedError();
 				}
 			}
 
-			if (req.$action.auth == "required" && !user)
+			if (!user)
 				throw new UnAuthorizedError();
 		},
 		async authenticate(ctx, route, req, res) {
-			this.logger.info("Authenticate method called");
+			this.logger.info("Authorize method called");
 			let token;
 			if (req.headers.authorization) {
 				let type = req.headers.authorization.split(" ")[0];
@@ -190,24 +190,24 @@ module.exports = {
 					if (user) {
 						this.logger.info(
 							"Authenticated via JWT: ",
-							user.username
+							user.email
 						);
 						// Reduce user fields (it will be transferred to other nodes)
 						ctx.meta.user = _.pick(user, [
 							"id",
-							"username",
 							"email",
 						]);
 						ctx.meta.token = token;
-						ctx.meta.userID = user._id;
+						ctx.meta.userID = user.id;
 					}
 				} catch (err) {
 					// Ignored because we continue processing if user doesn't exists
+					throw new UnAuthorizedError();
 				}
 			}
 
-			if (req.$action.auth == "required" && !user)
+			if (!user)
 				throw new UnAuthorizedError();
-		}
+		},
 	},
 };
