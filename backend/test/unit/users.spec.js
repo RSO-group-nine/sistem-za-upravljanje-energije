@@ -3,12 +3,9 @@
 const { ServiceBroker } = require("moleculer");
 const ApiService = require("../../services/api.service");
 const UsersService = require("../../services/users.service");
-const supertest = require("supertest");
-const { Sequelize } = require("sequelize");
 
-describe("Test API Service", () => {
+describe("Test Users Service", () => {
 	let broker;
-	// let sequelize;
 
 	beforeAll(async () => {
 		// Create a new ServiceBroker
@@ -16,6 +13,7 @@ describe("Test API Service", () => {
 
 		// Load the service
 		broker.createService(UsersService);
+		broker.createService(ApiService);
 
 		// Start the broker
 		await broker.start();

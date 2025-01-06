@@ -1,15 +1,12 @@
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
-const gptService = require("../../services/gpt.service");
+const ApiService = require("../../services/api.service");
 const devicesService = require("../../services/devices.service");
 const UsersService = require("../../services/users.service");
-const supertest = require("supertest");
-const { Sequelize } = require("sequelize");
 
-describe("Test API Service", () => {
+describe("Test Devices Service", () => {
 	let broker;
-	// let sequelize;
 
 	beforeAll(async () => {
 		// Create a new ServiceBroker
