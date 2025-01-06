@@ -1,9 +1,8 @@
-"use strict";
-
 const { ServiceBroker } = require("moleculer");
 const UsersService = require("../../services/users.service");
 const DevicesService = require("../../services/devices.service");
-const ApiService = require("../../services/api.service");
+const GptService = require("../../services/gpt.service");
+const ApiServices = require("../../services/api.service");
 
 describe("Test API Services", () => {
 	// Create a Service Broker
@@ -12,7 +11,8 @@ describe("Test API Services", () => {
 	// Load the services
 	broker.createService(UsersService);
 	broker.createService(DevicesService);
-	broker.createService(ApiService);
+	broker.createService(GptService);
+	broker.createService(ApiServices);
 
 	// Start the broker before tests
 	beforeAll(() => broker.start());
