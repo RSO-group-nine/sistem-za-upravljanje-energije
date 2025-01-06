@@ -4,37 +4,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devices-deployment
-  namespace: default
+  name: {{ .Values.devices.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    name: devices-deployment
-    app: sistem-za-upravljanje-energije
+    name: {{ .Values.devices.name }}
+    app: {{ .Values.app }}
 spec:
   selector:
     matchLabels:
-      app: devices
-  replicas: 2
+      app: {{ .Values.devices.appLabel }}
+  replicas: {{ .Values.devices.replicas }}
   template:
     metadata:
       labels:
-        app: devices
+        app: {{ .Values.devices.appLabel }}
     spec:
       containers:
-        - name: devices
-          image: zigac24/sistem-za-upravljanje-energije:latest
-          imagePullPolicy: Always
+        - name: {{ .Values.devices.containerName }}
+          image: {{ .Values.devices.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
           envFrom:
             - configMapRef:
-                name: molecular-configmap
+                name: {{ .Values.devices.configMapName }}
             - secretRef:
-                name: molecular-secrets
+                name: {{ .Values.devices.secretName }}
           env:
             - name: SERVICES
-              value: devices
+              value: {{ .Values.devices.serviceName }}
           resources:
             limits:
-              cpu: 200m
-              memory: 500Mi
+              cpu: {{ .Values.devices.resources.limits.cpu }}
+              memory: {{ .Values.devices.resources.limits.memory }}
             requests:
-              cpu: 50m
-              memory: 40Mi
+              cpu: {{ .Values.devices.resources.requests.cpu }}
+              memory: {{ .Values.devices.resources.requests.memory }}

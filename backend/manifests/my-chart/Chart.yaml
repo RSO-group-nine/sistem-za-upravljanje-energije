@@ -1,6 +1,6 @@
 apiVersion: v2
-name: my-chart
-description: A Helm chart for Kubernetes
+name: sistem-za-upravljanje-energije
+description: A Helm chart for sistem za upravljanje energije
 
 # A chart can be either an 'application' or a 'library' chart.
 #

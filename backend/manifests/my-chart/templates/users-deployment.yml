@@ -1,40 +1,38 @@
-#########################################################
-# users service
-#########################################################
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-deployment
-  namespace: default
+  name: {{ .Values.users.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    name: users-deployment
-    app: sistem-za-upravljanje-energije
+    name: {{ .Values.users.name }}
+    app: {{ .Values.app }}
 spec:
   selector:
     matchLabels:
-      app: users
-  replicas: 2
+      app: {{ .Values.users.appLabel }}
+  replicas: {{ .Values.users.replicas }}
   template:
     metadata:
       labels:
-        app: users
+        app: {{ .Values.users.appLabel }}
     spec:
       containers:
-        - name: users
-          image: zigac24/sistem-za-upravljanje-energije:latest
-          imagePullPolicy: Always
+        - name: {{ .Values.users.containerName }}
+          image: {{ .Values.users.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
           envFrom:
             - configMapRef:
-                name: molecular-configmap
+                name: {{ .Values.users.configMapName }}
             - secretRef:
-                name: molecular-secrets
+                name: {{ .Values.users.secretName }}
           env:
             - name: SERVICES
-              value: users
+              value: {{ .Values.users.serviceValue }}
           resources:
             limits:
-              cpu: 200m
-              memory: 500Mi
+              cpu: {{ .Values.users.resources.limits.cpu }}
+              memory: {{ .Values.users.resources.limits.memory }}
             requests:
-              cpu: 50m
-              memory: 40Mi
+              cpu: {{ .Values.users.resources.requests.cpu }}
+              memory: {{ .Values.users.resources.requests.memory }}
