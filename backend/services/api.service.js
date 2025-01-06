@@ -41,7 +41,7 @@ module.exports = {
 					credentials: true,
 					maxAge: 3600,
 				},
-
+				
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
 
@@ -49,10 +49,10 @@ module.exports = {
 				mergeParams: true,
 
 				// Enable authentication. Implement the logic into `authenticate` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authentication
-				authentication: false,
+				authentication: true,
 
 				// Enable authorization. Implement the logic into `authorize` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authorization
-				authorization: false,
+				authorization: true,
 
 				// The auto-alias feature allows you to declare your route alias directly in your services.
 				// The gateway will dynamically build the full routes from service schema.
@@ -133,9 +133,6 @@ module.exports = {
 
 	methods: {
 		/**
-		 * Authorize the request. Check that the authenticated user has right to access the resource.
-		 *
-		 * PLEASE NOTE, IT'S JUST AN EXAMPLE IMPLEMENTATION. DO NOT USE IN PRODUCTION!
 		 *
 		 * @param {Context} ctx
 		 * @param {Object} route
@@ -143,13 +140,13 @@ module.exports = {
 		 * @returns {Promise}
 		 */
 		async authorize(ctx, route, req) {
+			this.logger.info("Authorize method called");
 			let token;
 			if (req.headers.authorization) {
 				let type = req.headers.authorization.split(" ")[0];
 				if (type === "Token" || type === "Bearer")
 					token = req.headers.authorization.split(" ")[1];
 			}
-
 			let user;
 			if (token) {
 				// Verify JWT token
@@ -177,5 +174,40 @@ module.exports = {
 			if (req.$action.auth == "required" && !user)
 				throw new UnAuthorizedError();
 		},
+		async authenticate(ctx, route, req, res) {
+			this.logger.info("Authenticate method called");
+			let token;
+			if (req.headers.authorization) {
+				let type = req.headers.authorization.split(" ")[0];
+				if (type === "Token" || type === "Bearer")
+					token = req.headers.authorization.split(" ")[1];
+			}
+			let user;
+			if (token) {
+				// Verify JWT token
+				try {
+					user = await ctx.call("users.resolveToken", { token });
+					if (user) {
+						this.logger.info(
+							"Authenticated via JWT: ",
+							user.username
+						);
+						// Reduce user fields (it will be transferred to other nodes)
+						ctx.meta.user = _.pick(user, [
+							"id",
+							"username",
+							"email",
+						]);
+						ctx.meta.token = token;
+						ctx.meta.userID = user._id;
+					}
+				} catch (err) {
+					// Ignored because we continue processing if user doesn't exists
+				}
+			}
+
+			if (req.$action.auth == "required" && !user)
+				throw new UnAuthorizedError();
+		}
 	},
 };

@@ -5,7 +5,8 @@ export default async function verifyUser(token: string) {
         const response = await fetch(`${baseURL}/users/resolve`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({ token }),
         });
