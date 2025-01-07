@@ -32,11 +32,9 @@ spec:
             - name: SERVICES
               value: {{ .Values.devices.serviceName }}
           volumeMounts:
-            # Mount the ConfigMap as a volume
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
-            # Mount the Secret as a volume
             - name: secret-volume
               mountPath: /etc/secret
               readOnly: true
@@ -47,12 +45,10 @@ spec:
             requests:
               cpu: {{ .Values.devices.resources.requests.cpu }}
               memory: {{ .Values.devices.resources.requests.memory }}
-        volumes:
-        # Define the ConfigMap volume
-        - name: config-volume
-          configMap:
-            name: { { .Values.users.configMapName } }
-        # Define the Secret volume
-        - name: secret-volume
-          secret:
-            secretName: { { .Values.users.secretName } }
+      volumes:
+      - name: config-volume
+        configMap:
+          name: { { .Values.users.configMapName } }
+      - name: secret-volume
+        secret:
+          secretName: { { .Values.users.secretName } }
