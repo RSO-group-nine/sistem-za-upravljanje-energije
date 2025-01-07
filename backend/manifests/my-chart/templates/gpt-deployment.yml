@@ -4,33 +4,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { { .Values.gpt.name } }
-  namespace: { { .Values.namespace } }
+  name: {{ .Values.gpt.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    name: { { .Values.gpt.name } }
-    app: { { .Values.app } }
+    name: {{ .Values.gpt.name }}
+    app: {{ .Values.app }}
 spec:
   selector:
     matchLabels:
-      app: { { .Values.gpt.appLabel } }
-  replicas: { { .Values.gpt.replicas } }
+      app: {{ .Values.gpt.appLabel }}
+  replicas: {{ .Values.gpt.replicas }}
   template:
     metadata:
       labels:
-        app: { { .Values.gpt.appLabel } }
+        app: {{ .Values.gpt.appLabel }}
     spec:
       containers:
-        - name: { { .Values.gpt.containerName } }
-          image: { { .Values.gpt.image } }
-          imagePullPolicy: { { .Values.imagePullPolicy } }
+        - name: {{ .Values.gpt.containerName }}
+          image: {{ .Values.gpt.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
           envFrom:
             - configMapRef:
-                name: { { .Values.gpt.configMapName } }
+                name: {{ .Values.gpt.configMapName }}
             - secretRef:
-                name: { { .Values.gpt.secretName } }
+                name: {{ .Values.gpt.secretName }}
           env:
             - name: SERVICES
-              value: { { .Values.gpt.serviceName } }
+              value: {{ .Values.gpt.serviceName }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
