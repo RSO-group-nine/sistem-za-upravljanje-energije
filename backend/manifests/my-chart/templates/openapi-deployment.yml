@@ -29,13 +29,6 @@ spec:
           env:
             - name: SERVICES
               value: {{ .Values.openapi.serviceValue }}
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/config
-              readOnly: true
-            - name: secret-volume
-              mountPath: /etc/secret
-              readOnly: true
           resources:
             limits:
               cpu: {{ .Values.openapi.resources.limits.cpu }}
@@ -43,10 +36,3 @@ spec:
             requests:
               cpu: {{ .Values.openapi.resources.requests.cpu }}
               memory: {{ .Values.openapi.resources.requests.memory }}
-      volumes:
-      - name: config-volume
-        configMap:
-          name: {{ .Values.users.configMapName }}
-      - name: secret-volume
-        secret:
-          secretName: {{ .Values.users.secretName }}

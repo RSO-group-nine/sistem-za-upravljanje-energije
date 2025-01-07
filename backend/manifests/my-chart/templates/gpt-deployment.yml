@@ -31,13 +31,6 @@ spec:
           env:
             - name: SERVICES
               value: {{ .Values.gpt.serviceName }}
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/config
-              readOnly: true
-            - name: secret-volume
-              mountPath: /etc/secret
-              readOnly: true
           resources:
             limits:
               cpu: {{ .Values.gpt.resources.limits.cpu }}
@@ -45,10 +38,3 @@ spec:
             requests:
               cpu: {{ .Values.gpt.resources.requests.cpu }}
               memory: {{ .Values.gpt.resources.requests.memory }}
-      volumes:
-        - name: config-volume
-          configMap:
-            name: {{ .Values.users.configMapName }}
-        - name: secret-volume
-          secret:
-            secretName: {{ .Values.users.secretName }}
