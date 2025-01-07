@@ -147,6 +147,20 @@ module.exports = {
 				return JSON.parse(res);
 			},
 		},
+		live: {
+			rest: "GET /live",
+			async handler(ctx) {
+				this.logger.info("Device service is live!");
+				return "The device service is live!";
+			},
+		},
+		ready: {
+			rest: "GET /ready",
+			async handler(ctx) {
+				this.logger.info("Device service is ready!");
+				return "The device service is ready!";
+			},
+		}
 	},
 
 	methods: {

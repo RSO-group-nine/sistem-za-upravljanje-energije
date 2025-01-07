@@ -31,6 +31,7 @@
     "@azure/identity": "^4.5.0",
     "@azure/storage-queue": "^12.24.0",
     "@google/generative-ai": "^0.21.0",
+    "@r2d2bzh/moleculer-healthcheck-middleware": "^2.0.2",
     "azure-iot-common": "^1.13.2",
     "azure-iot-device": "^1.18.3",
     "azure-iot-device-mqtt": "^1.16.3",
