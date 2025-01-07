@@ -40,15 +40,15 @@ spec:
               readOnly: true
           resources:
             limits:
-              cpu: { { .Values.gpt.resources.limits.cpu } }
-              memory: { { .Values.gpt.resources.limits.memory } }
+              cpu: {{ .Values.gpt.resources.limits.cpu }}
+              memory: {{ .Values.gpt.resources.limits.memory }}
             requests:
-              cpu: { { .Values.gpt.resources.requests.cpu } }
-              memory: { { .Values.gpt.resources.requests.memory } }
+              cpu: {{ .Values.gpt.resources.requests.cpu }}
+              memory: {{ .Values.gpt.resources.requests.memory }}
       volumes:
         - name: config-volume
           configMap:
-            name: { { .Values.users.configMapName } }
+            name: {{ .Values.users.configMapName }}
         - name: secret-volume
           secret:
-            secretName: { { .Values.users.secretName } }
+            secretName: {{ .Values.users.secretName }}

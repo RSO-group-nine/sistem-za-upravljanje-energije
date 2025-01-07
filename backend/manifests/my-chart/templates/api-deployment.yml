@@ -72,7 +72,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: { { .Values.users.configMapName } }
+          name: {{ .Values.users.configMapName }}
       - name: secret-volume
         secret:
-          secretName: { { .Values.users.secretName } }
+          secretName: {{ .Values.users.secretName }}
