@@ -62,17 +62,3 @@ spec:
             requests:
               cpu: {{ .Values.api.resources.requests.cpu }}
               memory: {{ .Values.api.resources.requests.memory }}
-          livenessProbe:
-            httpGet:
-              path: /api/v1/devices/live  # Verify this path is correct
-              port: {{ .Values.api.port }}  # Ensure this matches your API service port
-            initialDelaySeconds: 5  # Adjust based on your app's startup time
-            periodSeconds: 10  # Frequency of checks
-            timeoutSeconds: 5  # Allow enough time for the response
-          readinessProbe:
-            httpGet:
-              path: /api/v1/devices/ready  # Verify this path is correct
-              port: {{ .Values.api.port }}  # Ensure this matches your API service port
-            initialDelaySeconds: 10  # Allow app to initialize
-            periodSeconds: 5  # Frequency of checks
-            timeoutSeconds: 5  # Allow enough time for the response
