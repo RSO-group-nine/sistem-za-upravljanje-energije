@@ -1,5 +1,4 @@
 import { baseURL } from "./baseUrl";
-import { useCookies } from "react-cookie";
 
 export default async function userLogout(token: string) {
     const response = await fetch(`${baseURL}/users/logout`, {
