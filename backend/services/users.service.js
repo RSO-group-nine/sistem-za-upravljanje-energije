@@ -228,7 +228,7 @@ module.exports = {
 				this.logger.info("users service is ready!");
 				return "The users service is ready!";
 			},
-		}
+		},
 	},
 	methods: {
 		/**
