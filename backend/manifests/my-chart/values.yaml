@@ -41,6 +41,14 @@ devices:
     requests:
       cpu: 50m
       memory: 40Mi
+  livenessProbe:
+    path: /devices/live
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  readinessProbe:
+    path: /devices/ready
+    initialDelaySeconds: 10
+    periodSeconds: 10
 
 # GPT Service
 gpt:
