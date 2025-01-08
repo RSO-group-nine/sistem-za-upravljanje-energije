@@ -68,10 +68,10 @@ spec:
               path: /api/v1/api/list-aliases
               port: {{ .Values.api.port }}
             initialDelaySeconds: 30
-            periodSeconds: 60
+            periodSeconds: 600
           readinessProbe:
             httpGet:
               path: /api/v1/api/list-aliases
               port: {{ .Values.api.port }}
             initialDelaySeconds: 5
-            periodSeconds: 60
+            periodSeconds: 600

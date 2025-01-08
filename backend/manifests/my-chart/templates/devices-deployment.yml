@@ -42,7 +42,7 @@ spec:
                 - -c
                 - "wget -qO- http://api:3000/api/v1/devices/live || exit 1"
             initialDelaySeconds: 300
-            periodSeconds: 60
+            periodSeconds: 600
           readinessProbe:
             exec:
               command:
@@ -50,4 +50,4 @@ spec:
                 - -c
                 - "wget -qO- http://api:3000/api/v1/devices/ready || exit 1"
             initialDelaySeconds: 250
-            periodSeconds: 60
+            periodSeconds: 600
