@@ -42,11 +42,11 @@ devices:
       cpu: 50m
       memory: 40Mi
   livenessProbe:
-    path: /devices/live
+    path: /api/v1/devices/live
     initialDelaySeconds: 10
     periodSeconds: 5
   readinessProbe:
-    path: /devices/ready
+    path: /api/v1/devices/ready
     initialDelaySeconds: 10
     periodSeconds: 10
 
