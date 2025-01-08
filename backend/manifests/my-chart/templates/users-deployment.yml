@@ -36,20 +36,20 @@ spec:
             requests:
               cpu: {{ .Values.users.resources.requests.cpu }}
               memory: {{ .Values.users.resources.requests.memory }}
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/users/health/live || exit 1"
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/users/health/ready || exit 1"
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/users/health/live || exit 1"
+            initialDelaySeconds: 300
+            periodSeconds: 60
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/users/health/ready || exit 1"
+            initialDelaySeconds: 280
+            periodSeconds: 60
 

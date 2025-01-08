@@ -35,19 +35,19 @@ spec:
             requests:
               cpu: {{ .Values.devices.resources.requests.cpu }}
               memory: {{ .Values.devices.resources.requests.memory }}
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/devices/live || exit 1"
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/devices/ready || exit 1"
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/devices/live || exit 1"
+            initialDelaySeconds: 300
+            periodSeconds: 60
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/devices/ready || exit 1"
+            initialDelaySeconds: 250
+            periodSeconds: 60
