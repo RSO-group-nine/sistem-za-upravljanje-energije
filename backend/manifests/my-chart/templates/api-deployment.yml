@@ -63,15 +63,15 @@ spec:
               cpu: {{ .Values.api.resources.requests.cpu }}
               memory: {{ .Values.api.resources.requests.memory }}
 
-          livenessProbe:
-            httpGet:
-              path: /api/v1/api/list-aliases
-              port: {{ .Values.api.port }}
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /api/v1/api/list-aliases
-              port: {{ .Values.api.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/v1/api/list-aliases
+          #     port: {{ .Values.api.port }}
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 10
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/v1/api/list-aliases
+          #     port: {{ .Values.api.port }}
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
