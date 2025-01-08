@@ -38,19 +38,19 @@ spec:
             requests:
               cpu: {{ .Values.gpt.resources.requests.cpu }}
               memory: {{ .Values.gpt.resources.requests.memory }}
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/gpt/live || exit 1"
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - /bin/sh
-          #       - -c
-          #       - "wget -qO- http://api:3000/api/v1/gpt/ready || exit 1"
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/gpt/live || exit 1"
+            initialDelaySeconds: 300
+            periodSeconds: 600
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "wget -qO- http://api:3000/api/v1/gpt/ready || exit 1"
+            initialDelaySeconds: 300
+            periodSeconds: 600
