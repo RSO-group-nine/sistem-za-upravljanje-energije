@@ -41,7 +41,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - "wget -qO- http://api:3000/api/v1/users/live || exit 1"
+                - "wget -qO- http://api:3000/api/v1/users/health/live || exit 1"
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
@@ -49,7 +49,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - "wget -qO- http://api:3000/api/v1/users/ready || exit 1"
+                - "wget -qO- http://api:3000/api/v1/users/health/ready || exit 1"
             initialDelaySeconds: 5
             periodSeconds: 10
 

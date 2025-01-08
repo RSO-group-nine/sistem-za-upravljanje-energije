@@ -216,14 +216,14 @@ module.exports = {
 			},
 		},
 		live: {
-			rest: "GET /live",
+			rest: "GET /health/live",
 			async handler(ctx) {
 				this.logger.info("users service is live!");
 				return "The users service is live!";
 			},
 		},
 		ready: {
-			rest: "GET /ready",
+			rest: "GET /health/ready",
 			async handler(ctx) {
 				this.logger.info("users service is ready!");
 				return "The users service is ready!";
