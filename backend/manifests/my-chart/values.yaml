@@ -8,6 +8,7 @@ api:
   port: 3000
   name: api
   app: api
+  version: v1
   serviceName: api
   replicas: 1
   containerName: api
@@ -29,6 +30,7 @@ devices:
   appLabel: devices
   serviceName: devices
   replicas: 2
+  port: 3001
   containerName: devices
   image: zigac24/sistem-za-upravljanje-energije:latest
   configMapName: molecular-configmap
@@ -42,11 +44,11 @@ devices:
       cpu: 50m
       memory: 40Mi
   livenessProbe:
-    path: /devices/live
+    path: /api/v1/devices/live
     initialDelaySeconds: 10
     periodSeconds: 5
   readinessProbe:
-    path: /devices/ready
+    path: /api/v1/devices/ready
     initialDelaySeconds: 10
     periodSeconds: 10
 

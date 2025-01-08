@@ -55,6 +55,20 @@ module.exports = {
 				}
 			},
 		},
+		live: {
+			rest: "GET /live",
+			async handler(ctx) {
+				this.logger.info("GPT service is live!");
+				return "The GPT service is live!";
+			},
+		},
+		ready: {
+			rest: "GET /ready",
+			async handler(ctx) {
+				this.logger.info("GPT service is ready!");
+				return "The GPT service is ready!";
+			},
+		},
 	},
 
 	/**
