@@ -8,6 +8,7 @@ api:
   port: 3000
   name: api
   app: api
+  version: v1
   serviceName: api
   replicas: 1
   containerName: api
