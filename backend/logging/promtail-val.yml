@@ -1,2 +1,0 @@
-clients:
-  - url : http://logging-loki-gateway/loki/api/v1/push
