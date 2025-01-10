@@ -3,8 +3,6 @@
 const { ServiceBroker } = require("moleculer");
 const UsersService = require("../../services/users.service");
 const DevicesService = require("../../services/devices.service");
-const GptService = require("../../services/gpt.service");
-const ApiServices = require("../../services/api.service");
 
 describe("Test Devices Service", () => {
 	let broker;
@@ -16,8 +14,6 @@ describe("Test Devices Service", () => {
 		// Load the services
 		broker.createService(UsersService);
 		broker.createService(DevicesService);
-		broker.createService(GptService);
-		broker.createService(ApiServices);
 
 		// Start the broker
 		await broker.start();

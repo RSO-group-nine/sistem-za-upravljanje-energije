@@ -10,7 +10,7 @@ const { QueueClient } = require("@azure/storage-queue");
 
 const DeviceClient = require("azure-iot-device").Client;
 const Protocol = require("azure-iot-device-mqtt").Mqtt;
-
+require("dotenv").config();
 /**
  * @typedef {import('moleculer').Context} Context
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema
@@ -22,7 +22,7 @@ module.exports = {
 	mixins: [DbService],
 
 	// Use Sequelize adapter for PostgreSQL
-	adapter: new SqlAdapter(process.env.POSTGRES_URI),
+	adapter: new SqlAdapter(process.env.POSTGRES_URI, { dialect: "postgres" }),
 
 	model: {
 		// Define the model for PostgreSQL using Sequelize DataTypes
@@ -111,7 +111,7 @@ module.exports = {
 						404
 					);
 				}
-				
+
 				const result = devices
 					.filter((device) => device.user_email === user_email)
 					.map((device) => device.toJSON());
@@ -160,7 +160,7 @@ module.exports = {
 				this.logger.info("Device service is ready!");
 				return "The device service is ready!";
 			},
-		}
+		},
 	},
 
 	methods: {
