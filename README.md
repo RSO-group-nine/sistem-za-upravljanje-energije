@@ -114,12 +114,10 @@ Our microservises:
 
 - Users
 - Devices
+- Monitoring
 - Gpt
-- IoT
-
-IoT is used to deploy the IoT devices to Azure IoT Hub. For that we use script `populate.js` in the `backend` folder.
-Here you need to specific the connection string to your Azure IoT Hub Device to generate data for the devices.
-Then all the information about can be found with devices microservice.
+- IoT (IoT is used to deploy the IoT devices to Azure IoT Hub. For that we use script `populate.js` in the `backend` folder.
+  Here you need to specific the connection string to your Azure IoT Hub Device to generate data for the devices.)
 
 To access the documentation, navigate to the following URL: **[http://157.230.78.156:3000/api/openapi/ui](http://157.230.78.156:3000/api/openapi/ui)**.
 
