@@ -10,7 +10,7 @@ export default async function getDeviceReadings(device: Device, token: string) {
     const id = device.device_id;
     console.log(`Fetching device readings for device ${az_device_id}...`);
     try {
-        const response = await fetch(`${baseURL}/devices/info`, {
+        const response = await fetch(`${baseURL}/monitoring/info`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

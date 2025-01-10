@@ -52,6 +52,34 @@ devices:
     initialDelaySeconds: 10
     periodSeconds: 10
 
+# Monitoring Service
+monitoring:
+  name: monitoring-deployment
+  appLabel: monitoring
+  serviceName: monitoring
+  replicas: 2
+  port: 3001
+  containerName: monitoring
+  image: zigac24/sistem-za-upravljanje-energije:latest
+  configMapName: molecular-configmap
+  secretName: molecular-secrets
+  serviceValue: monitoring
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 40Mi
+  livenessProbe:
+    path: /api/v1/monitoring/live
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  readinessProbe:
+    path: /api/v1/monitoring/ready
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
 # GPT Service
 gpt:
   name: gpt-deployment
@@ -74,20 +102,20 @@ gpt:
 # NATS Configuration
 nats:
   statefulSetName: nats
-  configMapName:  nats-config
+  configMapName: nats-config
   serviceName: nats
   appLabel: nats
   replicas: 3
   image: nats:2.1.7-alpine3.11
-  httpPort: 8222  # Replace with your desired HTTP port
-  clusterPort: 6222  # Replace with your desired cluster port
+  httpPort: 8222 # Replace with your desired HTTP port
+  clusterPort: 6222 # Replace with your desired cluster port
   clusterRoutes: # Add your cluster routes here if needed
     - "nats://nats-0.nats.default.svc.cluster.local:6222"
     - "nats://nats-1.nats.default.svc.cluster.local:6222"
     - "nats://nats-2.nats.default.svc.cluster.local:6222"
   connectRetries: 30
-  leafnodePort: 7422  # Replace with your desired leafnode port
-  maxPayload: 4Mb  # Maximum payload size
+  leafnodePort: 7422 # Replace with your desired leafnode port
+  maxPayload: 4Mb # Maximum payload size
   terminationGracePeriod: 60
   ports:
     client: 4222

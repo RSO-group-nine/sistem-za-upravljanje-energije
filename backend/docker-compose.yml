@@ -122,6 +122,24 @@ services:
       - nats
       - redis
 
+  monitoring:
+    build:
+      context: .
+    image: zigac24/sistem-za-upravljanje-energije:latest
+    env_file:
+      - docker-compose.env
+      - .env
+    environment:
+      SERVICES: monitoring
+    volumes:
+      - app_data:/app/data
+      - ./monitoring/prometheus:/app/monitoring/prometheus
+    expose:
+      - 3030
+    depends_on:
+      - nats
+      - redis
+
   gpt:
     build:
       context: .

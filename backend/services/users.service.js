@@ -2,16 +2,16 @@
 const { MoleculerClientError } = require("moleculer").Errors;
 const DbService = require("moleculer-db");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
-const { Sequelize, DataTypes, where, json } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
 /**
  * @typedef {import('moleculer').Context} Context
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema
  * @typedef {import('moleculer-db').MoleculerDB} MoleculerDB
  */
-
 module.exports = {
 	name: "users",
 	mixins: [DbService],
