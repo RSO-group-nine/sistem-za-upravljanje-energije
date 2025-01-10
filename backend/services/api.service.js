@@ -34,7 +34,14 @@ module.exports = {
 
 				whitelist: ["**"],
 				cors: {
-					origin: ["http://localhost:3000", "http://localhost:5000", "https://rso-frontend.vercel.app", "https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app", "http://192.168.64.100:3000", "https://sistem-za-upravljanje-energije-91846956206.europe-west3.run.app"], // Allow all origins for testing purposes
+					origin: [
+						"http://localhost:3000",
+						"http://localhost:5000",
+						"https://rso-frontend.vercel.app",
+						"https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app",
+						"http://192.168.64.100:3000",
+						"https://sistem-za-upravljanje-energije-91846956206.europe-west3.run.app",
+					], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
 					allowedHeaders: ["Content-Type", "Authorization"],
 					exposedHeaders: ["Set-Cookie"],
@@ -129,6 +136,16 @@ module.exports = {
 			// Options to `server-static` module
 			options: {},
 		},
+		circuitBreaker: {
+			enabled: true,
+			threshold: 0.3,
+			windowTime: 30,
+		},
+		retryPolicy: {
+			enabled: true,
+			retries: 3,
+			delay: 500,
+		},
 	},
 
 	methods: {
@@ -154,15 +171,9 @@ module.exports = {
 				try {
 					user = await ctx.call("users.resolveToken", { token });
 					if (user) {
-						this.logger.info(
-							"Authenticated via JWT: ",
-							user.email
-						);
+						this.logger.info("Authenticated via JWT: ", user.email);
 						// Reduce user fields (it will be transferred to other nodes)
-						ctx.meta.user = _.pick(user, [
-							"id",
-							"email",
-						]);
+						ctx.meta.user = _.pick(user, ["id", "email"]);
 						ctx.meta.token = token;
 						ctx.meta.userID = user.id;
 					}
@@ -189,15 +200,9 @@ module.exports = {
 				try {
 					user = await ctx.call("users.resolveToken", { token });
 					if (user) {
-						this.logger.info(
-							"Authenticated via JWT: ",
-							user.email
-						);
+						this.logger.info("Authenticated via JWT: ", user.email);
 						// Reduce user fields (it will be transferred to other nodes)
-						ctx.meta.user = _.pick(user, [
-							"id",
-							"email",
-						]);
+						ctx.meta.user = _.pick(user, ["id", "email"]);
 						ctx.meta.token = token;
 						ctx.meta.userID = user.id;
 					}

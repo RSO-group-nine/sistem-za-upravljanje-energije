@@ -64,6 +64,16 @@ module.exports = {
 		entityValidator: {
 			user_email: { type: "email" },
 		},
+		circuitBreaker: {
+			enabled: true,
+			threshold: 0.3,
+			windowTime: 30,
+		},
+		retryPolicy: {
+			enabled: true,
+			retries: 3,
+			delay: 500,
+		},
 	},
 
 	actions: {

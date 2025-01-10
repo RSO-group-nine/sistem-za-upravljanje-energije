@@ -44,6 +44,16 @@ module.exports = {
 			email: { type: "email" },
 			password: { type: "string", min: 6 },
 		},
+		circuitBreaker: {
+			enabled: true,
+			threshold: 0.3,
+			windowTime: 30,
+		},
+		retryPolicy: {
+			enabled: true,
+			retries: 3,
+			delay: 500,
+		},
 	},
 
 	actions: {
