@@ -36,82 +36,44 @@ The application is divided into two main folders:
 
 ---
 
+## How to Run the Project
+
 ### Backend
 
-Navigate to the backend folder and use the following scripts:
+1. Navigate to the `backend` folder.
+2. Install dependencies:
 
-#### Install node modules
 ```bash
 npm install
- ```
+```
 
-#### Start in development mode
+3. Rename the `.env.example` file to `.env` and fill in the required environment variables.
+4. Start the application:
+
 ```bash
 npm run dev
 ```
-
-#### Start in production mode
-
-```bash
-npm run build
-npm run start
-```
-
-#### Run tests
-
-```bash
-npm run test
-```
-
-#### Run lint
-
-```bash
-npm run lint
-```
-
-#### Docker compose commands
-
-Docker logs:
-
-```bash
-npm run dc:logs
-```
-
-Docker compose up and down
-
-```bash
-npm run dc:up
-npm run dc:down
-```
-
----
 
 ### Frontend
 
-Navigate to the frontend folder and use the following scripts:
+1. Navigate to the `frontend` folder.
+2. Install dependencies:
 
-#### Install node modules
 ```bash
 npm install
- ```
-
-#### Start in development mode
-
-```bash
-npm run dev
 ```
 
-#### Start in production mode
+3. Go to the `frontend/src/app/(general)/utils/baseUrl.js` file and change the baseUrl to the address of the backend server.
+4. Build the project:
 
 ```bash
 npm run build
-npm run start
 ```
 
-#### Run lint
+5. Start the application:
 
 ```bash
-npm run lint
+npm run start
 ```
 
 ---
