@@ -1,40 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { { .Values.monitoring.name } }
-  namespace: { { .Values.namespace } }
+  name: {{ .Values.monitoring.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    name: { { .Values.monitoring.name } }
-    app: { { .Values.app } }
+    name: {{ .Values.monitoring.name }}
+    app: {{ .Values.app }}
 spec:
   selector:
     matchLabels:
-      app: { { .Values.monitoring.appLabel } }
-  replicas: { { .Values.monitoring.replicas } }
+      app: {{ .Values.monitoring.appLabel }}
+  replicas: {{ .Values.monitoring.replicas }}
   template:
     metadata:
       labels:
-        app: { { .Values.monitoring.appLabel } }
+        app: {{ .Values.monitoring.appLabel }}
     spec:
       containers:
-        - name: { { .Values.monitoring.containerName } }
-          image: { { .Values.monitoring.image } }
-          imagePullPolicy: { { .Values.imagePullPolicy } }
+        - name: {{ .Values.monitoring.containerName }}
+          image: {{ .Values.monitoring.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
           envFrom:
             - configMapRef:
-                name: { { .Values.monitoring.configMapName } }
+                name: {{ .Values.monitoring.configMapName }}
             - secretRef:
-                name: { { .Values.monitoring.secretName } }
+                name: {{ .Values.monitoring.secretName }}
           env:
             - name: SERVICES
-              value: { { .Values.monitoring.serviceName } }
+              value: {{ .Values.monitoring.serviceName }}
           resources:
             limits:
-              cpu: { { .Values.monitoring.resources.limits.cpu } }
-              memory: { { .Values.monitoring.resources.limits.memory } }
+              cpu: {{ .Values.monitoring.resources.limits.cpu }}
+              memory: {{ .Values.monitoring.resources.limits.memory }}
             requests:
-              cpu: { { .Values.monitoring.resources.requests.cpu } }
-              memory: { { .Values.monitoring.resources.requests.memory } }
+              cpu: {{ .Values.monitoring.resources.requests.cpu }}
+              memory: {{ .Values.monitoring.resources.requests.memory }}
           livenessProbe:
             exec:
               command:
