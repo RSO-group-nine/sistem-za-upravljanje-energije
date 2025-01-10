@@ -104,7 +104,7 @@ Navigate to the frontend folder and use the following scripts:
 
 #### Commands
 
-```bash
+```json
 "scripts": {
   "dev": "next dev",
   "build": "next build",
