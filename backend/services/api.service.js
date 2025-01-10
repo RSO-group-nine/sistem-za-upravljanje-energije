@@ -1,5 +1,4 @@
 "use strict";
-
 require("dotenv").config();
 const ApiGateway = require("moleculer-web");
 const { UnAuthorizedError } = require("moleculer-web").Errors;
@@ -12,7 +11,6 @@ const _ = require("lodash");
  * @typedef {import('http').ServerResponse} ServerResponse HTTP Server Response
  * @typedef {import('moleculer-web').ApiSettingsSchema} ApiSettingsSchema API Setting Schema
  */
-
 module.exports = {
 	name: "api",
 	mixins: [ApiGateway],

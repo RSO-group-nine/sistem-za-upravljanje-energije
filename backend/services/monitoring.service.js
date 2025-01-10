@@ -12,7 +12,7 @@ require("dotenv").config();
  * @typedef {import('moleculer-db').MoleculerDB} MoleculerDB
  */
 module.exports = {
-	name: "devices",
+	name: "monitoring",
 	mixins: [DbService],
 
 	// Use Sequelize adapter for PostgreSQL
@@ -71,70 +71,46 @@ module.exports = {
 	},
 
 	actions: {
-		// Create a new user
-		getUserDevices: {
-			rest: "POST /getUserDevices",
-			// Use GET for fetching data
+		getDeviceMonitoringInfo: {
+			rest: "POST /info",
 			params: {
-				user_id: "number",
+				id: "number",
 			},
 			async handler(ctx) {
+				const device_id = ctx.params.id;
 				this.logger.info(
-					"Fetching devices for user with ID: ",
-					ctx.params.user_id
+					`Fetching device info for device with ID: ${device_id}`
 				);
-				const user_id = ctx.params.user_id;
-				this.logger.info(
-					`Fetching devices for user with ID: ${user_id}`
+				const device = await this.adapter.findById(device_id);
+				if (!device) {
+					throw new MoleculerClientError("Device not found", 404);
+				}
+				const data = device.toJSON();
+				const az_device_id = data.az_device_id;
+				const res = await this.readMessages(
+					this.settings.Q_CONNECTION_STRING,
+					this.settings.Q_NAME,
+					az_device_id
 				);
 
-				// First, find the user by user_id (assuming you have an action or method for this)
-				const user = await this.broker.call("users.getUserById", {
-					user_id,
-				});
-
-				this.logger.info(`User found: ${user}`);
-
-				if (!user) {
-					throw new MoleculerClientError("User not found", 404);
+				if (!res) {
+					throw new MoleculerClientError("No messages found", 404);
 				}
-
-				const user_email = user.email; // Assuming user object has the email field
-				this.logger.info(`User email: ${user_email}`);
-
-				// Ta vrstica ne dela iz nekega razloga
-				const devices = await this.adapter.find({
-					where: { user_email: user_email },
-				});
-
-				this.logger.info(`Devices found: ${devices}`);
-
-				if (!devices || devices.length === 0) {
-					throw new MoleculerClientError(
-						"No devices found for this user",
-						404
-					);
-				}
-
-				const result = devices
-					.filter((device) => device.user_email === user_email)
-					.map((device) => device.toJSON());
-				this.logger.info(`Result: ${result}`);
-				return JSON.parse(JSON.stringify(result));
+				return JSON.parse(res);
 			},
 		},
 		live: {
 			rest: "GET /live",
 			async handler(ctx) {
-				this.logger.info("Device service is live!");
-				return "The device service is live!";
+				this.logger.info("Monitoring service is live!");
+				return "The monitoring service is live!";
 			},
 		},
 		ready: {
 			rest: "GET /ready",
 			async handler(ctx) {
-				this.logger.info("Device service is ready!");
-				return "The device service is ready!";
+				this.logger.info("Monitoring service is ready!");
+				return "The monitoring service is ready!";
 			},
 		},
 	},
@@ -204,6 +180,6 @@ module.exports = {
 		// Seed the database with some initial data
 		await this.seedDB();
 		// Log a message to the console
-		this.logger.info("Device service started!");
+		this.logger.info("Monitoring service started!");
 	},
 };

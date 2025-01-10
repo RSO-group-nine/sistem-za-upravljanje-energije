@@ -3,6 +3,7 @@
 const { ServiceBroker } = require("moleculer");
 const UsersService = require("../../services/users.service");
 const DevicesService = require("../../services/devices.service");
+const MonitoringService = require("../../services/monitoring.service");
 
 describe("Test Devices Service", () => {
 	let broker;
@@ -14,6 +15,7 @@ describe("Test Devices Service", () => {
 		// Load the services
 		broker.createService(UsersService);
 		broker.createService(DevicesService);
+		broker.createService(MonitoringService);
 
 		// Start the broker
 		await broker.start();
@@ -84,9 +86,12 @@ describe("Test Devices Service", () => {
 			expect(device).toHaveProperty("user_email");
 		});
 
-		const deviceInfo = await broker.call("devices.getDeviceInfo", {
-			id: getDevices[0].device_id,
-		});
+		const deviceInfo = await broker.call(
+			"monitoring.getDeviceMonitoringInfo",
+			{
+				id: getDevices[0].device_id,
+			}
+		);
 
 		// Check that the response is an array
 		expect(Array.isArray(deviceInfo)).toBe(true);

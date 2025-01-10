@@ -9,7 +9,7 @@ api:
   name: api
   app: api
   serviceName: api
-  replicas: 1  # Keep as is for dev
+  replicas: 1 # Keep as is for dev
   containerName: api
   image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
   configMapName: molecular-configmap
@@ -17,18 +17,18 @@ api:
   serviceValue: api
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
 
 # Devices Service
 devices:
   name: devices-deployment
   appLabel: devices
   serviceName: devices
-  replicas: 1  # Reduced for development
+  replicas: 1 # Reduced for development
   containerName: devices
   image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
   configMapName: molecular-configmap
@@ -36,18 +36,37 @@ devices:
   serviceValue: devices
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
+
+# Monitoring Service
+monitoring:
+  name: monitoring-deployment
+  appLabel: monitoring
+  serviceName: monitoring
+  replicas: 1 # Reduced for development
+  containerName: monitoring
+  image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
+  configMapName: molecular-configmap
+  secretName: molecular-secrets
+  serviceValue: monitoring
+  resources:
+    limits:
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
+    requests:
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
 
 # GPT Service
 gpt:
   name: gpt-deployment
   appLabel: gpt
   serviceName: gpt
-  replicas: 1  # Reduced for development
+  replicas: 1 # Reduced for development
   containerName: gpt
   image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
   configMapName: molecular-configmap
@@ -55,19 +74,19 @@ gpt:
   serviceValue: gpt
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
 
 # NATS Configuration
 nats:
   statefulSetName: nats
-  configMapName:  nats-config
+  configMapName: nats-config
   serviceName: nats
   appLabel: nats
-  replicas: 1  # Reduced for development
+  replicas: 1 # Reduced for development
   image: nats:2.1.7-alpine3.11
   httpPort: 8222
   clusterPort: 6222
@@ -97,7 +116,7 @@ nats:
 openapi:
   name: openapi-deployment
   appLabel: openapi
-  replicas: 1  # Reduced for development
+  replicas: 1 # Reduced for development
   containerName: openapi
   image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
   configMapName: molecular-configmap
@@ -105,33 +124,33 @@ openapi:
   serviceValue: openapi
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
 
 # Redis Service
 redis:
   name: redis
   app: redis
-  replicas: 1  # Keep as is for dev
+  replicas: 1 # Keep as is for dev
   containerName: redis
   image: redis
   port: 6379
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
 
 # Users Service
 users:
   name: users-deployment
   appLabel: users
-  replicas: 1  # Reduced for development
+  replicas: 1 # Reduced for development
   containerName: users
   image: zigac24/sistem-za-upravljanje-energije:latest # Use a dev image tag
   configMapName: molecular-configmap
@@ -139,8 +158,8 @@ users:
   serviceValue: users
   resources:
     limits:
-      cpu: 100m  # Lower CPU limit for dev
-      memory: 256Mi  # Lower memory limit for dev
+      cpu: 100m # Lower CPU limit for dev
+      memory: 256Mi # Lower memory limit for dev
     requests:
-      cpu: 50m  # Lower request CPU for dev
-      memory: 128Mi  # Lower request memory for dev
+      cpu: 50m # Lower request CPU for dev
+      memory: 128Mi # Lower request memory for dev
