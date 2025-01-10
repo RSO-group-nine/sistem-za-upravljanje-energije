@@ -40,29 +40,17 @@ The application is divided into two main folders:
 
 Navigate to the backend folder and use the following scripts:
 
-#### Commands
+#### Install node modules
+```bash
+npm install
+ ```
 
-```json
-"scripts": {
-  "dev": "moleculer-runner --repl --hot services/**/*.service.js",
-  "start": "moleculer-runner",
-  "cli": "moleculer connect NATS",
-  "ci": "jest --watch",
-  "test": "jest --coverage",
-  "lint": "eslint services",
-  "dc:up": "docker-compose up --build -d",
-  "dc:logs": "docker-compose logs -f",
-  "dc:down": "docker-compose down"
-}
-```
-
-#### Development mode
-
+#### Start in development mode
 ```bash
 npm run dev
 ```
 
-#### Start production mode
+#### Start in production mode
 
 ```bash
 npm run build
@@ -102,24 +90,18 @@ npm run dc:down
 
 Navigate to the frontend folder and use the following scripts:
 
-#### Commands
+#### Install node modules
+```bash
+npm install
+ ```
 
-```json
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "next lint"
-}
-```
-
-#### Development mode
+#### Start in development mode
 
 ```bash
 npm run dev
 ```
 
-#### Start production mode
+#### Start in production mode
 
 ```bash
 npm run build
