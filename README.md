@@ -9,7 +9,7 @@
 
 ## Application Idea
 
-A web application that monitors household energy consumption and provides recommendations for energy savings.
+As part of the project, we developed a web application that provides users with a comprehensive view of the measurements from their devices registered on Azure IoT Hub. Based on these measurements, the application offers smart suggestions for optimizing consumption via the OpenAI API.
 
 ## Planned Features
 
@@ -40,6 +40,9 @@ The application is divided into two main folders:
 7. **Deployment** (Kubernetes, Google Cloud Run, Docker Hub, Azure IoT Hub)
 
 <!-- ADD IMAGE HERE -->
+
+Image of the Architecture Schema
+![Architecture Schema](./frontend/public/img/SchemeArchitecture.png)
 
 ---
 
@@ -87,7 +90,7 @@ npm run start
 
 ## Use Case
 
-<!-- TODO -->
+All the services are interconnected. The user must first register to be able to log in. The user must be logged in to view their dashboard. The user can only see their own devices from the IoT Azure Hub. For these devices, they can then monitor detailed information on a graph. Finally, they can ask the AI model for recommendations on reducing energy consumption based on the device data or not. At the end, the user can log out of the application.
 
 ---
 
