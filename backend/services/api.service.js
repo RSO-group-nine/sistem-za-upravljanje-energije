@@ -111,6 +111,7 @@ module.exports = {
 				logging: true,
 			},
 			{
+				// Swagger
 				path: "/api/openapi",
 				aliases: {
 					"GET /openapi.json": "openapi.generateDocs", // swagger scheme
