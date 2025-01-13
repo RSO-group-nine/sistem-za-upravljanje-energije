@@ -38,6 +38,7 @@ module.exports = {
 						"https://rso-frontend.vercel.app",
 						"https://sistem-za-upravljanje-energije-91846956206.us-central1.run.app",
 						"http://192.168.64.100:3000",
+						"http://157.230.78.156:3000",
 						"https://sistem-za-upravljanje-energije-91846956206.europe-west3.run.app",
 					], // Allow all origins for testing purposes
 					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
