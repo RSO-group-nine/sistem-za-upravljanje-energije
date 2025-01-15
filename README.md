@@ -137,9 +137,48 @@ To access the documentation, navigate to the following URL: **[http://157.230.78
 
 ## Collecting metrics ( Grafana )
 
+We integrated Grafana with (1) Prometheus to collect metrics and (2) with Loki, to collect logs from all microservices.
+
+Grafana is exposed inside a cluster with the following command.
+
+```bash
+ kubectl port-forward deployment/my-prom-grafana 3000 -n monitoring
+```
+After running the command, the Grafana interface is available on **[http://localhost:3000/login](http://localhost:3000/login)**
+
+To login, enter the following information:
+
+Grafana user: **admin**
+
+Grafana password: **prom-operator**
+
 ---
 
 ## Health Check
+
+Health and readiness checks were implemented for each microservice seperatly at the following endpoints:
+
+
+### Devices
+
+**[http://157.230.78.156:3000/api/v1/devices/ready](http://157.230.78.156:3000/api/v1/devices/ready)**
+
+**[http://157.230.78.156:3000/api/v1/devices/live](http://157.230.78.156:3000/api/v1/devices/live)**
+
+### Gpt
+**[http://157.230.78.156:3000/api/v1/gpt/ready](http://157.230.78.156:3000/api/v1/gpt/ready)**
+
+**[http://157.230.78.156:3000/api/v1/gpt/live](http://157.230.78.156:3000/api/v1/gpt/live)**
+
+### Users
+**[http://157.230.78.156:3000/api/v1/users/health/ready](http://157.230.78.156:3000/api/v1/users/health/ready)**
+
+**[http://157.230.78.156:3000/api/v1/users/health/live](http://157.230.78.156:3000/api/v1/users/health/live)**
+
+### Monitoring
+**[http://157.230.78.156:3000/api/v1/monitoring/ready](http://157.230.78.156:3000/api/v1/monitoring/ready)**
+
+**[http://157.230.78.156:3000/api/v1/monitoring/live](http://157.230.78.156:3000/api/v1/monitoring/live)**
 
 ---
 
