@@ -39,9 +39,8 @@ The application is divided into two main folders:
 6. **Testing** (Jest)
 7. **Deployment** (Kubernetes, Google Cloud Run, Docker Hub, Azure IoT Hub)
 
-<!-- ADD IMAGE HERE -->
+Image of the Architecture Schema:
 
-Image of the Architecture Schema
 ![Architecture Schema](./frontend/public/img/SchemeArchitecture.png)
 
 ---
@@ -51,7 +50,12 @@ Image of the Architecture Schema
 ### Backend
 
 1. Navigate to the `backend` folder.
-2. Install dependencies:
+
+```bash
+cd backend
+```
+
+3. Install dependencies:
 
 ```bash
 npm install
@@ -67,6 +71,11 @@ npm run dev
 ### Frontend
 
 1. Navigate to the `frontend` folder.
+   
+```bash
+cd frontend
+```
+
 2. Install dependencies:
 
 ```bash
@@ -126,6 +135,14 @@ To access the documentation, navigate to the following URL: **[http://157.230.78
 
 ---
 
+## Collecting metrics ( Grafana )
+
+---
+
+## Health Check
+
+---
+
 ## Updating project code
 
 To update the project code, you need to follow these steps:
@@ -134,14 +151,25 @@ To update the project code, you need to follow these steps:
 2. Run the following command to install the dependencies:
 
 ```bash
+cd backend
+npm install
+
+cd ..
+
+cd frontend
 npm install
 ```
 
 3. Create a new branch for your changes.
 4. Make the necessary changes.
-5. Run the tests to ensure that everything is working correctly:
+5. Make sure that application builds succesffuly with following command:
+```bash
+npm run build
+```
+6. Run the tests to ensure that everything is working correctly:
 
 ```bash
+cd backend
 npm run test
 ```
 
